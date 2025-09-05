@@ -1,0 +1,35 @@
+Package: jmleIRT
+Title: Joint Maximum Likelihood Estimation of the Rasch Model
+Version: 0.0.2-0
+Date: 2025-09-05
+Authors@R: c(
+  person(given = "Jan", 
+         family = "Steinfeld", 
+         email = "jan.d.steinfeld@gmail.com", 
+         role = c("cre","aut"),
+         comment = c(ORCID = "0000-0001-9853-8260")
+         ), 
+  person(given = "Alexander", 
+         family = "Robitzsch", 
+         email = "robitzsch@leibniz-ipn.de", 
+         role = c("aut"),
+         comment = c(ORCID = "0000-0002-8226-3132")
+         )
+  )
+Author: Jan Steinfeld [cre, aut] (<https://orcid.org/0000-0001-9853-8260>), Alexander Robitzsch [aut] (<https://orcid.org/0000-0002-8226-3132>)
+Maintainer: Jan Steinfeld <jan.d.steinfeld@gmail.com>
+URL: https://jansteinfeld.github.io/jmleIRT/,
+        https://github.com/jansteinfeld/jmleIRT
+BugReports: https://github.com/jansteinfeld/jmleIRT/issues
+Description: Implements joint maximum likelihood estimation (JMLE) for item parameters in the Rasch model (1PL). Provides methods for bias correction of item parameter estimates and weighted likelihood estimation (WLE) of person parameters.
+License: GPL-3
+LazyLoad: yes
+Depends: R (>= 3.0)
+Language: en-US
+Encoding: UTF-8
+VignetteBuilder: knitr
+NeedsCompilation: yes
+Imports: Rcpp
+LinkingTo: Rcpp, RcppEigen
+Suggests:knitr,rmarkdown,prettydoc,testthat (>= 3.0.0),ggplot2,covr
+RoxygenNote: 7.3.2

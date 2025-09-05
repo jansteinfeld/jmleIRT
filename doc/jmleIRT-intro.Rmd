@@ -21,20 +21,56 @@ bibliography: references.bib
 csl: apa.csl
 ---
 
-```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE, message = TRUE, warning = FALSE)
-library(jmleIRT)
-set.seed(123)
+```{r setup, echo=FALSE, message=FALSE, warning=FALSE}
+  knitr::opts_chunk$set(
+    collapse = TRUE,
+    comment = "#>",
+    fig.width = 10, 
+    fig.height = 10
+  )
+  options(width=80)
+
+  # includes: in_header: "header.html"
+  library(jmleIRT)
 ```
 
-## Introduction
 
-This vignette introduces the **jmleIRT** package, which provides efficient joint maximum likelihood estimation (JML) for the Rasch model (1PL) with dichotomous items. 
+# Introduction
+
+The `jmleIRT` package provides an implementation of Joint Maximum Likelihood Estimation (JMLE) for the Rasch (1PL) model. It allows estimation of item difficulties and person abilities from dichotomous response data with bias correction and weighted likelihood estimation options.
+
+# Rasch Model Specification
+
+For person \( p = 1, \ldots, P \) and item \( i = 1, \ldots, I \), the Rasch model posits the probability of a correct response \(X_{pi}\) as:
+
+\[
+P(X_{pi} = 1 \mid \theta_p, \beta_i) = \frac{\exp(\theta_p - \beta_i)}{1 + \exp(\theta_p - \beta_i)}
+\]
+
+where \(\theta_p\) represents the ability of person \( p \) and \(\beta_i\) the difficulty of item \( i \).
+
+# Joint Maximum Likelihood Estimation
+
+The joint likelihood across all persons and items is
+
+\[
+L(\theta, \beta) = \prod_{p=1}^P \prod_{i=1}^I P(X_{pi} \mid \theta_p, \beta_i)
+\]
+
+JMLE alternates updates for \(\theta_p\) and \(\beta_i\) until convergence, providing simultaneous estimates of person and item parameters.
+
+# Bias Correction
+
+Finite samples and extreme scores induce bias in JMLE estimates. The package implements:
+
+- **Epsilon bias stabilization:** Adding a small \(\varepsilon > 0\) to avoid infinite logits and improve numerical stability.
+- **Analytical bias correction:** Drawing on methods from psychometric literature to reduce bias in item difficulty estimates.
+
+# Using the jmleIRT Package
 
 Key features:
-
-- Tolerates missing responses (`NA`).
-- Optional epsilon adjustment (`eps`) to reduce bias from extreme scores.
+- Missing values by design are allowed (`NA`).
+- Optional epsilon adjustment (`eps`) to reduce estimation bias from extreme scores.
 - Centering based on either "items" or "persons" to ensure identifiability.
 - Post-hoc bias correction (`bias_correction = TRUE/FALSE`).
 - Optional computation of Warm's weighted likelihood estimates (WLE) for person parameters (`estimatewle = TRUE`).
@@ -95,7 +131,7 @@ summary(fit$beta)
 
 ## Warm's WLE Estimates
 
-Warm’s weighted likelihood estimates can be obtained in addition to JML estimates.
+Warm's weighted likelihood estimates can be obtained in addition to JML estimates.
 
 ```{r wle-example}
 fit_wle <- jmle_estimation(X, center = "items", estimatewle = TRUE)

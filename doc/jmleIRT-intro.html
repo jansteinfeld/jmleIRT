@@ -12,7 +12,7 @@
 
 <meta name="author" content="Jan Steinfeld &amp; Alexander Robitzsch" />
 
-<meta name="date" content="2025-09-04" />
+<meta name="date" content="2025-09-05" />
 
 <title>First steps with the Package jmleIRT</title>
 
@@ -164,68 +164,104 @@ margin-top: 1em;
 jmleIRT</h1>
 <h4 class="author project-author">Jan Steinfeld &amp; Alexander
 Robitzsch</h4>
-<h4 class="date project-date">September 04, 2025</h4>
+<h4 class="date project-date">September 05, 2025</h4>
 </section>
 
 
 
 <section class="main-content">
-<div id="introduction" class="section level2" number="1">
-<h2><span class="header-section-number">1</span> Introduction</h2>
-<p>This vignette introduces the <strong>jmleIRT</strong> package, which
-provides efficient joint maximum likelihood estimation (JML) for the
-Rasch model (1PL) with dichotomous items.</p>
-<p>Key features:</p>
+<div id="introduction" class="section level1" number="1">
+<h1><span class="header-section-number">1</span> Introduction</h1>
+<p>The <code>jmleIRT</code> package provides an implementation of Joint
+Maximum Likelihood Estimation (JMLE) for the Rasch (1PL) model. It
+allows estimation of item difficulties and person abilities from
+dichotomous response data with bias correction and weighted likelihood
+estimation options.</p>
+</div>
+<div id="rasch-model-specification" class="section level1" number="2">
+<h1><span class="header-section-number">2</span> Rasch Model
+Specification</h1>
+<p>For person <span class="math inline">\(p = 1, \ldots, P\)</span> and
+item <span class="math inline">\(i = 1, \ldots, I\)</span>, the Rasch
+model posits the probability of a correct response <span class="math inline">\(X_{pi}\)</span> as:</p>
+<p><span class="math display">\[
+P(X_{pi} = 1 \mid \theta_p, \beta_i) = \frac{\exp(\theta_p - \beta_i)}{1
++ \exp(\theta_p - \beta_i)}
+\]</span></p>
+<p>where <span class="math inline">\(\theta_p\)</span> represents the
+ability of person <span class="math inline">\(p\)</span> and <span class="math inline">\(\beta_i\)</span> the difficulty of item <span class="math inline">\(i\)</span>.</p>
+</div>
+<div id="joint-maximum-likelihood-estimation" class="section level1" number="3">
+<h1><span class="header-section-number">3</span> Joint Maximum
+Likelihood Estimation</h1>
+<p>The joint likelihood across all persons and items is</p>
+<p><span class="math display">\[
+L(\theta, \beta) = \prod_{p=1}^P \prod_{i=1}^I P(X_{pi} \mid \theta_p,
+\beta_i)
+\]</span></p>
+<p>JMLE alternates updates for <span class="math inline">\(\theta_p\)</span> and <span class="math inline">\(\beta_i\)</span> until convergence, providing
+simultaneous estimates of person and item parameters.</p>
+</div>
+<div id="bias-correction" class="section level1" number="4">
+<h1><span class="header-section-number">4</span> Bias Correction</h1>
+<p>Finite samples and extreme scores induce bias in JMLE estimates. The
+package implements:</p>
 <ul>
-<li>Tolerates missing responses (<code>NA</code>).</li>
-<li>Optional epsilon adjustment (<code>eps</code>) to reduce bias from
-extreme scores.</li>
-<li>Centering based on either “items” or “persons” to ensure
-identifiability.</li>
-<li>Post-hoc bias correction
-(<code>bias_correction = TRUE/FALSE</code>).</li>
-<li>Optional computation of Warm’s weighted likelihood estimates (WLE)
-for person parameters (<code>estimatewle = TRUE</code>).</li>
-<li>Fast Newton-Raphson optimization in C++.</li>
+<li><strong>Epsilon bias stabilization:</strong> Adding a small <span class="math inline">\(\varepsilon &gt; 0\)</span> to avoid infinite
+logits and improve numerical stability.</li>
+<li><strong>Analytical bias correction:</strong> Drawing on methods from
+psychometric literature to reduce bias in item difficulty
+estimates.</li>
 </ul>
 </div>
-<div id="simulating-data" class="section level2" number="2">
-<h2><span class="header-section-number">2</span> Simulating Data</h2>
+<div id="using-the-jmleirt-package" class="section level1" number="5">
+<h1><span class="header-section-number">5</span> Using the jmleIRT
+Package</h1>
+<p>Key features: - Missing values by design are allowed
+(<code>NA</code>). - Optional epsilon adjustment (<code>eps</code>) to
+reduce estimation bias from extreme scores. - Centering based on either
+“items” or “persons” to ensure identifiability. - Post-hoc bias
+correction (<code>bias_correction = TRUE/FALSE</code>). - Optional
+computation of Warm’s weighted likelihood estimates (WLE) for person
+parameters (<code>estimatewle = TRUE</code>). - Fast Newton-Raphson
+optimization in C++.</p>
+<div id="simulating-data" class="section level2" number="5.1">
+<h2><span class="header-section-number">5.1</span> Simulating Data</h2>
 <p>We first simulate a dataset of person responses.</p>
 <div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" tabindex="-1"></a>N <span class="ot">&lt;-</span> <span class="dv">100</span>  <span class="co"># persons</span></span>
 <span id="cb1-2"><a href="#cb1-2" tabindex="-1"></a>I <span class="ot">&lt;-</span> <span class="dv">10</span>   <span class="co"># items</span></span>
 <span id="cb1-3"><a href="#cb1-3" tabindex="-1"></a>X <span class="ot">&lt;-</span> <span class="fu">matrix</span>(<span class="fu">rbinom</span>(N <span class="sc">*</span> I, <span class="dv">1</span>, <span class="fl">0.5</span>), <span class="at">nrow =</span> N)</span>
 <span id="cb1-4"><a href="#cb1-4" tabindex="-1"></a><span class="co"># randomly set 10% of entries to missing</span></span>
 <span id="cb1-5"><a href="#cb1-5" tabindex="-1"></a>X[<span class="fu">sample</span>(<span class="fu">length</span>(X), <span class="at">size =</span> <span class="fl">0.1</span> <span class="sc">*</span> <span class="fu">length</span>(X))] <span class="ot">&lt;-</span> <span class="cn">NA</span></span>
-<span id="cb1-6"><a href="#cb1-6" tabindex="-1"></a><span class="fu">head</span>(X)</span></code></pre></div>
-<pre><code>##      [,1] [,2] [,3] [,4] [,5] [,6] [,7] [,8] [,9] [,10]
-## [1,]    0    1    0    1    1    0    0    1    0     1
-## [2,]    1    0    1    0    0    0    1    0    0     1
-## [3,]    0    0    1    1    1    0    0    0    0     1
-## [4,]    1    1    1    1    1    0    0    1    0     1
-## [5,]   NA    0    0    1    0    0    0    0    0     1
-## [6,]    0    1   NA    0    0    0    1    1    1     1</code></pre>
+<span id="cb1-6"><a href="#cb1-6" tabindex="-1"></a><span class="fu">head</span>(X)</span>
+<span id="cb1-7"><a href="#cb1-7" tabindex="-1"></a><span class="co">#&gt;      [,1] [,2] [,3] [,4] [,5] [,6] [,7] [,8] [,9] [,10]</span></span>
+<span id="cb1-8"><a href="#cb1-8" tabindex="-1"></a><span class="co">#&gt; [1,]   NA   NA   NA    1    1    0    0    0    1     0</span></span>
+<span id="cb1-9"><a href="#cb1-9" tabindex="-1"></a><span class="co">#&gt; [2,]   NA    0    1    0    1    0    1   NA    0     1</span></span>
+<span id="cb1-10"><a href="#cb1-10" tabindex="-1"></a><span class="co">#&gt; [3,]    0    0    0    1    1    0    1    0    0     1</span></span>
+<span id="cb1-11"><a href="#cb1-11" tabindex="-1"></a><span class="co">#&gt; [4,]    0    1    1    0    1    0    0    1    1    NA</span></span>
+<span id="cb1-12"><a href="#cb1-12" tabindex="-1"></a><span class="co">#&gt; [5,]    0    0    0    0    1    1    0    1    1     0</span></span>
+<span id="cb1-13"><a href="#cb1-13" tabindex="-1"></a><span class="co">#&gt; [6,]    0    0    0    0    0    1    0    0    0     1</span></span></code></pre></div>
 </div>
-<div id="basic-jml-estimation" class="section level2" number="3">
-<h2><span class="header-section-number">3</span> Basic JML
+<div id="basic-jml-estimation" class="section level2" number="5.2">
+<h2><span class="header-section-number">5.2</span> Basic JML
 Estimation</h2>
 <p>Run the JML estimation with centering on “items” (default):</p>
-<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" tabindex="-1"></a>fit <span class="ot">&lt;-</span> <span class="fu">jmle_estimation</span>(</span>
-<span id="cb3-2"><a href="#cb3-2" tabindex="-1"></a>  X, <span class="at">max_iter =</span> <span class="dv">500</span>, <span class="at">conv =</span> <span class="fl">1e-5</span>,</span>
-<span id="cb3-3"><a href="#cb3-3" tabindex="-1"></a>  <span class="at">center =</span> <span class="st">&quot;items&quot;</span>, <span class="at">bias_correction =</span> <span class="cn">FALSE</span>,</span>
-<span id="cb3-4"><a href="#cb3-4" tabindex="-1"></a>  <span class="at">estimatewle =</span> <span class="cn">FALSE</span>, <span class="at">verbose =</span> <span class="cn">FALSE</span></span>
-<span id="cb3-5"><a href="#cb3-5" tabindex="-1"></a>)</span>
-<span id="cb3-6"><a href="#cb3-6" tabindex="-1"></a></span>
-<span id="cb3-7"><a href="#cb3-7" tabindex="-1"></a><span class="fu">str</span>(fit)</span></code></pre></div>
-<pre><code>## List of 7
-##  $ theta          : num [1:100] 0.0443 -0.3636 -0.3636 0.8967 -1.2362 ...
-##  $ beta           : num [1:10] 0.1945 -0.088 -0.0023 0.3709 0.0685 ...
-##  $ iterations     : int 500
-##  $ converged      : logi FALSE
-##  $ bias_correction: logi FALSE
-##  $ center         : chr &quot;items&quot;
-##  $ wle_estimate   : num [1:100] NA NA NA NA NA NA NA NA NA NA ...
-##  - attr(*, &quot;class&quot;)= chr [1:2] &quot;jmleIRT&quot; &quot;list&quot;</code></pre>
+<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" tabindex="-1"></a>fit <span class="ot">&lt;-</span> <span class="fu">jmle_estimation</span>(</span>
+<span id="cb2-2"><a href="#cb2-2" tabindex="-1"></a>  X, <span class="at">max_iter =</span> <span class="dv">500</span>, <span class="at">conv =</span> <span class="fl">1e-5</span>,</span>
+<span id="cb2-3"><a href="#cb2-3" tabindex="-1"></a>  <span class="at">center =</span> <span class="st">&quot;items&quot;</span>, <span class="at">bias_correction =</span> <span class="cn">FALSE</span>,</span>
+<span id="cb2-4"><a href="#cb2-4" tabindex="-1"></a>  <span class="at">estimatewle =</span> <span class="cn">FALSE</span>, <span class="at">verbose =</span> <span class="cn">FALSE</span></span>
+<span id="cb2-5"><a href="#cb2-5" tabindex="-1"></a>)</span>
+<span id="cb2-6"><a href="#cb2-6" tabindex="-1"></a></span>
+<span id="cb2-7"><a href="#cb2-7" tabindex="-1"></a><span class="fu">str</span>(fit)</span>
+<span id="cb2-8"><a href="#cb2-8" tabindex="-1"></a><span class="co">#&gt; List of 7</span></span>
+<span id="cb2-9"><a href="#cb2-9" tabindex="-1"></a><span class="co">#&gt;  $ theta          : num [1:100] -0.2965 0.0698 -0.4045 0.2411 -0.4045 ...</span></span>
+<span id="cb2-10"><a href="#cb2-10" tabindex="-1"></a><span class="co">#&gt;  $ beta           : num [1:10] 0.014 0.276 -0.213 0.335 -0.191 ...</span></span>
+<span id="cb2-11"><a href="#cb2-11" tabindex="-1"></a><span class="co">#&gt;  $ iterations     : int 500</span></span>
+<span id="cb2-12"><a href="#cb2-12" tabindex="-1"></a><span class="co">#&gt;  $ converged      : logi FALSE</span></span>
+<span id="cb2-13"><a href="#cb2-13" tabindex="-1"></a><span class="co">#&gt;  $ bias_correction: logi FALSE</span></span>
+<span id="cb2-14"><a href="#cb2-14" tabindex="-1"></a><span class="co">#&gt;  $ center         : chr &quot;items&quot;</span></span>
+<span id="cb2-15"><a href="#cb2-15" tabindex="-1"></a><span class="co">#&gt;  $ wle_estimate   : num [1:100] NA NA NA NA NA NA NA NA NA NA ...</span></span>
+<span id="cb2-16"><a href="#cb2-16" tabindex="-1"></a><span class="co">#&gt;  - attr(*, &quot;class&quot;)= chr [1:2] &quot;jmleIRT&quot; &quot;list&quot;</span></span></code></pre></div>
 <p>The output is a list with:</p>
 <ul>
 <li><code>theta</code>: person ability estimates</li>
@@ -238,47 +274,47 @@ Estimation</h2>
 <li><code>wle_estimate</code>: person WLEs (if requested)</li>
 </ul>
 </div>
-<div id="bias-correction" class="section level2" number="4">
-<h2><span class="header-section-number">4</span> Bias Correction</h2>
+<div id="bias-correction-1" class="section level2" number="5.3">
+<h2><span class="header-section-number">5.3</span> Bias Correction</h2>
 <p>Bias correction rescales item difficulty estimates.</p>
-<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" tabindex="-1"></a>fit_bc <span class="ot">&lt;-</span> <span class="fu">jmle_estimation</span>(X, <span class="at">center =</span> <span class="st">&quot;items&quot;</span>, <span class="at">bias_correction =</span> <span class="cn">TRUE</span>)</span>
-<span id="cb5-2"><a href="#cb5-2" tabindex="-1"></a><span class="fu">summary</span>(fit_bc<span class="sc">$</span>beta)</span></code></pre></div>
-<pre><code>##     Min.  1st Qu.   Median     Mean  3rd Qu.     Max. 
-## -0.18164 -0.10964 -0.03233  0.00000  0.04572  0.33383</code></pre>
+<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" tabindex="-1"></a>fit_bc <span class="ot">&lt;-</span> <span class="fu">jmle_estimation</span>(X, <span class="at">center =</span> <span class="st">&quot;items&quot;</span>, <span class="at">bias_correction =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb3-2"><a href="#cb3-2" tabindex="-1"></a><span class="fu">summary</span>(fit_bc<span class="sc">$</span>beta)</span>
+<span id="cb3-3"><a href="#cb3-3" tabindex="-1"></a><span class="co">#&gt;     Min.  1st Qu.   Median     Mean  3rd Qu.     Max. </span></span>
+<span id="cb3-4"><a href="#cb3-4" tabindex="-1"></a><span class="co">#&gt; -0.46124 -0.15379 -0.01638  0.00000  0.20146  0.34694</span></span></code></pre></div>
 <p>Compare to the uncorrected version:</p>
-<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" tabindex="-1"></a><span class="fu">summary</span>(fit<span class="sc">$</span>beta)</span></code></pre></div>
-<pre><code>##     Min.  1st Qu.   Median     Mean  3rd Qu.     Max. 
-## -0.20183 -0.12182 -0.03592  0.00000  0.05080  0.37092</code></pre>
+<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" tabindex="-1"></a><span class="fu">summary</span>(fit<span class="sc">$</span>beta)</span>
+<span id="cb4-2"><a href="#cb4-2" tabindex="-1"></a><span class="co">#&gt;    Min. 1st Qu.  Median    Mean 3rd Qu.    Max. </span></span>
+<span id="cb4-3"><a href="#cb4-3" tabindex="-1"></a><span class="co">#&gt; -0.5125 -0.1709 -0.0182  0.0000  0.2238  0.3855</span></span></code></pre></div>
 </div>
-<div id="warms-wle-estimates" class="section level2" number="5">
-<h2><span class="header-section-number">5</span> Warm’s WLE
+<div id="warms-wle-estimates" class="section level2" number="5.4">
+<h2><span class="header-section-number">5.4</span> Warm’s WLE
 Estimates</h2>
 <p>Warm’s weighted likelihood estimates can be obtained in addition to
 JML estimates.</p>
-<div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" tabindex="-1"></a>fit_wle <span class="ot">&lt;-</span> <span class="fu">jmle_estimation</span>(X, <span class="at">center =</span> <span class="st">&quot;items&quot;</span>, <span class="at">estimatewle =</span> <span class="cn">TRUE</span>)</span>
-<span id="cb9-2"><a href="#cb9-2" tabindex="-1"></a><span class="fu">head</span>(fit_wle<span class="sc">$</span>wle_estimate)</span></code></pre></div>
-<pre><code>## [1] -0.0004687014 -0.3710036412 -0.3710036412  0.7676160723 -1.1277960905
-## [6]  0.2021925822</code></pre>
+<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" tabindex="-1"></a>fit_wle <span class="ot">&lt;-</span> <span class="fu">jmle_estimation</span>(X, <span class="at">center =</span> <span class="st">&quot;items&quot;</span>, <span class="at">estimatewle =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb5-2"><a href="#cb5-2" tabindex="-1"></a><span class="fu">head</span>(fit_wle<span class="sc">$</span>wle_estimate)</span>
+<span id="cb5-3"><a href="#cb5-3" tabindex="-1"></a><span class="co">#&gt; [1] -0.26825065  0.06203598 -0.37484867  0.21141788 -0.37484867 -1.24617678</span></span></code></pre></div>
 </div>
-<div id="handling-missing-data" class="section level2" number="6">
-<h2><span class="header-section-number">6</span> Handling Missing
+<div id="handling-missing-data" class="section level2" number="5.5">
+<h2><span class="header-section-number">5.5</span> Handling Missing
 Data</h2>
 <p>The function handles missing responses (<code>NA</code>) without
 failure:</p>
-<div class="sourceCode" id="cb11"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" tabindex="-1"></a>X_miss <span class="ot">&lt;-</span> X</span>
-<span id="cb11-2"><a href="#cb11-2" tabindex="-1"></a>X_miss[<span class="dv">1</span><span class="sc">:</span><span class="dv">5</span>, <span class="dv">1</span><span class="sc">:</span><span class="dv">2</span>] <span class="ot">&lt;-</span> <span class="cn">NA</span></span>
-<span id="cb11-3"><a href="#cb11-3" tabindex="-1"></a>fit_miss <span class="ot">&lt;-</span> <span class="fu">jmle_estimation</span>(X_miss, <span class="at">center =</span> <span class="st">&quot;items&quot;</span>)</span>
-<span id="cb11-4"><a href="#cb11-4" tabindex="-1"></a></span>
-<span id="cb11-5"><a href="#cb11-5" tabindex="-1"></a><span class="fu">length</span>(fit_miss<span class="sc">$</span>theta)</span></code></pre></div>
-<pre><code>## [1] 100</code></pre>
-<div class="sourceCode" id="cb13"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" tabindex="-1"></a><span class="fu">length</span>(fit_miss<span class="sc">$</span>beta)</span></code></pre></div>
-<pre><code>## [1] 10</code></pre>
+<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" tabindex="-1"></a>X_miss <span class="ot">&lt;-</span> X</span>
+<span id="cb6-2"><a href="#cb6-2" tabindex="-1"></a>X_miss[<span class="dv">1</span><span class="sc">:</span><span class="dv">5</span>, <span class="dv">1</span><span class="sc">:</span><span class="dv">2</span>] <span class="ot">&lt;-</span> <span class="cn">NA</span></span>
+<span id="cb6-3"><a href="#cb6-3" tabindex="-1"></a>fit_miss <span class="ot">&lt;-</span> <span class="fu">jmle_estimation</span>(X_miss, <span class="at">center =</span> <span class="st">&quot;items&quot;</span>)</span>
+<span id="cb6-4"><a href="#cb6-4" tabindex="-1"></a></span>
+<span id="cb6-5"><a href="#cb6-5" tabindex="-1"></a><span class="fu">length</span>(fit_miss<span class="sc">$</span>theta)</span>
+<span id="cb6-6"><a href="#cb6-6" tabindex="-1"></a><span class="co">#&gt; [1] 100</span></span>
+<span id="cb6-7"><a href="#cb6-7" tabindex="-1"></a><span class="fu">length</span>(fit_miss<span class="sc">$</span>beta)</span>
+<span id="cb6-8"><a href="#cb6-8" tabindex="-1"></a><span class="co">#&gt; [1] 10</span></span></code></pre></div>
 </div>
-<div id="conclusion" class="section level2" number="7">
-<h2><span class="header-section-number">7</span> Conclusion</h2>
+<div id="conclusion" class="section level2" number="5.6">
+<h2><span class="header-section-number">5.6</span> Conclusion</h2>
 <p>The <strong>jmleIRT</strong> package provides a simple and efficient
 workflow for Rasch JML estimation with useful options such as centering,
 bias correction, and WLEs, while being robust to missing data.</p>
+</div>
 </div>
 </section>
 

@@ -22,7 +22,7 @@
 
     <a class="navbar-brand me-2" href="index.html">jmleIRT</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.0.2-11</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.0.2-0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -38,6 +38,7 @@
 <li><a class="dropdown-item" href="articles/jmleIRT-intro.html">First steps with the Package jmleIRT</a></li>
   </ul>
 </li>
+<li class="nav-item"><a class="nav-link" href="news/index.html">Changelog</a></li>
       </ul>
 <ul class="navbar-nav">
 <li class="nav-item"><a class="nav-link btn btn-primary" href="jansteinfeld.github.io/jmleIRT"><span class="fa fab fa-github"></span> GitHub</a></li>
@@ -127,32 +128,31 @@
 <p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>L</mi><mo stretchy="false" form="prefix">(</mo><mi>θ</mi><mo>,</mo><mi>β</mi><mo stretchy="false" form="postfix">)</mo><mo>=</mo><munderover><mo>∏</mo><mrow><mi>p</mi><mo>=</mo><mn>1</mn></mrow><mi>P</mi></munderover><munderover><mo>∏</mo><mrow><mi>i</mi><mo>=</mo><mn>1</mn></mrow><mi>I</mi></munderover><mi>P</mi><mo stretchy="false" form="prefix">(</mo><msub><mi>X</mi><mrow><mi>p</mi><mi>i</mi></mrow></msub><mo>∣</mo><msub><mi>θ</mi><mi>p</mi></msub><mo>,</mo><msub><mi>β</mi><mi>i</mi></msub><mo stretchy="false" form="postfix">)</mo></mrow><annotation encoding="application/x-tex">L(\theta, \beta) = \prod_{p=1}^P \prod_{i=1}^I P(X_{pi} \mid \theta_p, \beta_i)</annotation></semantics></math></p>
 <p>This is typically solved via an iterative algorithm alternating updates for <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>θ</mi><mi>p</mi></msub><annotation encoding="application/x-tex">\theta_p</annotation></semantics></math> and <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>β</mi><mi>i</mi></msub><annotation encoding="application/x-tex">\beta_i</annotation></semantics></math>, until convergence criteria are met.</p>
 <p>Although easy to implement and computationally efficient, JMLE estimates suffer from bias, especially in small samples or with extreme response patterns.</p>
+<p>Here is the updated version of the Bias Correction Methods section, formatted for integration into your README or vignette:</p>
+<hr>
 </div>
 <div class="section level2">
 <h2 id="bias-correction-methods">Bias Correction Methods<a class="anchor" aria-label="anchor" href="#bias-correction-methods"></a>
 </h2>
-<p>To mitigate estimation bias, several techniques are implemented:</p>
+<p>The Joint Maximum Likelihood Estimation (JMLE) for the Rasch model is known to produce biased parameter estimates, especially in finite samples and with extreme response patterns. The <code>jmleIRT</code> package implements two key bias correction techniques:</p>
 <ul>
 <li>
-<strong>Epsilon bias correction:</strong> Adding a small stabilization constant <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>ε</mi><mo>&gt;</mo><mn>0</mn></mrow><annotation encoding="application/x-tex">\varepsilon &gt; 0</annotation></semantics></math> to avoid infinite logits and stabilize extreme scores, promoting convergence and finite parameter estimates.</li>
+<strong>Epsilon adjustment:</strong> Proposed by Bertoli Barsotti, Punzo, and Lando, this method adds a small positive constant <math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>ε</mi><mo>&gt;</mo><mn>0</mn></mrow><annotation encoding="application/x-tex">\varepsilon &gt; 0</annotation></semantics></math> during the estimation process. This adjustment prevents infinite log-odds for perfect or zero scores, ensuring finite item difficulty and ability estimates. It also helps alleviate bias related to extreme response patterns by smoothing the estimation.</li>
 <li>
-<strong>Analytical bias correction:</strong> Based on theoretical adjustments to parameter estimates as described in recent psychometric literature [Bertoli et al., 2012; Lando &amp; Bertoli-Barsotti, 2014].</li>
+<strong>Analytical bias correction:</strong> This approach involves modifying the item difficulty estimates based on theoretical bias expressions derived from asymptotic expansions or minimum divergence estimators. It aims to reduce the structural bias inherent in the JMLE estimates as described in psychometric literature (e.g., Bertoli Barsotti &amp; Punzo, 2012; Lando &amp; Bertoli Barsotti, 2014).</li>
 </ul>
-<p>These methods enhance the accuracy and robustness of the JMLE algorithm.</p>
+<p>In combination, the epsilon adjustment promotes numerical stability and improved bias behavior at the estimation level, while analytical bias correction provides targeted, theoretically grounded refinement of item parameter estimates to enhance overall accuracy and robustness of the JMLE algorithm.</p>
 </div>
 <div class="section level2">
 <h2 id="package-features">Package Features<a class="anchor" aria-label="anchor" href="#package-features"></a>
 </h2>
 <ul>
 <li>Estimation of person and item parameters using bias-corrected JMLE</li>
-<li>Warm’s Weighted Likelihood Estimates (WLE) for refined ability estimation</li>
+<li>optional ability estimation based on Warm’s Weighted Likelihood Estimates (WLE)</li>
 <li>Handling of missing data</li>
-<li>Extensive test coverage ensuring reliability</li>
-<li>Comprehensive documentation and examples for ease of use</li>
+<li>documentation and examples</li>
 <li>Open-source development on GitHub for transparency and collaboration</li>
 <li>Optimized C++ backend for performance</li>
-<li>User-friendly R interface</li>
-<li>collaboration with psychometricians and statisticians for continuous improvement</li>
 </ul>
 </div>
 <div class="section level2">

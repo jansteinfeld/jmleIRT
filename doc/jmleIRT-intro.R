@@ -1,7 +1,14 @@
-## ----setup, include=FALSE-----------------------------------------------------
-knitr::opts_chunk$set(echo = TRUE, message = TRUE, warning = FALSE)
-library(jmleIRT)
-set.seed(123)
+## ----setup, echo=FALSE, message=FALSE, warning=FALSE--------------------------
+  knitr::opts_chunk$set(
+    collapse = TRUE,
+    comment = "#>",
+    fig.width = 10, 
+    fig.height = 10
+  )
+  options(width=80)
+
+  # includes: in_header: "header.html"
+  library(jmleIRT)
 
 ## ----simulate-data------------------------------------------------------------
 N <- 100  # persons

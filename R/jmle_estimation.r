@@ -61,7 +61,7 @@ jmle_estimation <- function(
 
   # Delegate to compiled routine (Rcpp)
   res <- estimate_jmle(
-    X = X,
+    X_ = X,
     max_iter = as.integer(max_iter),
     conv = conv,
     eps = eps,
@@ -102,7 +102,7 @@ wle_estimation <- function(
   X <- .coerce_binary_matrix(X)
   beta <- .coerce_numeric_vector(beta, n = ncol(X), name = "beta")
   res <- estimate_wle(
-    X = X,
+    X_ = X,
     beta = beta,
     max_iter = as.integer(max_iter),
     tol = tol,

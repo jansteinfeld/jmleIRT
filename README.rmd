@@ -105,26 +105,31 @@ This is typically solved via an iterative algorithm alternating updates for \(\t
 
 Although easy to implement and computationally efficient, JMLE estimates suffer from bias, especially in small samples or with extreme response patterns.
 
+
+Here is the updated version of the Bias Correction Methods section, formatted for integration into your README or vignette:
+
+***
+
 ## Bias Correction Methods
 
-To mitigate estimation bias, several techniques are implemented:
+The Joint Maximum Likelihood Estimation (JMLE) for the Rasch model is known to produce biased parameter estimates, especially in finite samples and with extreme response patterns.
+The `jmleIRT` package implements two key bias correction techniques:
 
-- **Epsilon bias correction:** Adding a small stabilization constant \(\varepsilon > 0\) to avoid infinite logits and stabilize extreme scores, promoting convergence and finite parameter estimates.
-- **Analytical bias correction:** Based on theoretical adjustments to parameter estimates as described in recent psychometric literature [Bertoli et al., 2012; Lando & Bertoli-Barsotti, 2014].
+- **Epsilon adjustment:** Proposed by Bertoli Barsotti, Punzo, and Lando, this method adds a small positive constant $$\varepsilon > 0$$ during the estimation process. This adjustment prevents infinite log-odds for perfect or zero scores, ensuring finite item difficulty and ability estimates. It also helps alleviate bias related to extreme response patterns by smoothing the estimation.
+- **Analytical bias correction:** This approach involves modifying the item difficulty estimates based on theoretical bias expressions derived from asymptotic expansions or minimum divergence estimators. It aims to reduce the structural bias inherent in the JMLE estimates as described in psychometric literature (e.g., Bertoli Barsotti & Punzo, 2012; Lando & Bertoli Barsotti, 2014).
 
-These methods enhance the accuracy and robustness of the JMLE algorithm.
+In combination, the epsilon adjustment promotes numerical stability and improved bias behavior at the estimation level, while analytical bias correction provides targeted, theoretically grounded refinement of item parameter estimates to enhance overall accuracy and robustness of the JMLE algorithm.
+
 
 ## Package Features
 
 - Estimation of person and item parameters using bias-corrected JMLE
-- Warm's Weighted Likelihood Estimates (WLE) for refined ability estimation
+- optional ability estimation based on Warm's Weighted Likelihood Estimates (WLE)
 - Handling of missing data
-- Extensive test coverage ensuring reliability
-- Comprehensive documentation and examples for ease of use
+- documentation and examples
 - Open-source development on GitHub for transparency and collaboration
 - Optimized C++ backend for performance
-- User-friendly R interface
-- collaboration with psychometricians and statisticians for continuous improvement
+
 
 
 ## References

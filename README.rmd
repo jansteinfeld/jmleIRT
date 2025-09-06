@@ -45,10 +45,7 @@ The `jmleIRT` package provides tools to estimate Rasch (1PL) model parameters us
 
 ## Installation
 
-Install from CRAN:
-```{r, eval = FALSE}
-install.packages("jmleIRT")
-```
+<!-- Install from CRAN: ```{r, eval = FALSE} install.packages("jmleIRT") ```
 
 Or from GitHub development version:
 ```{r, eval = FALSE}

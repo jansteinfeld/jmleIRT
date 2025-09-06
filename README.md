@@ -44,11 +44,6 @@ Estimates suitable for psychometric research.
 
 ## Installation
 
-Install from CRAN:
-
-``` r
-install.packages("jmleIRT")
-```
 
 Or from GitHub development version:
 

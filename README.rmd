@@ -28,30 +28,32 @@ knitr::opts_chunk$set(
 
 ## Overview
 
-The `jmleIRT` package provides tools to estimate Rasch (1PL) model parameters using **Joint Maximum Likelihood Estimation (JMLE)** in R. The package supports bias correction and Warm's Weighted Likelihood Estimates suitable for psychometric research.
+The `jmleIRT` package includes **Joint Maximum Likelihood Estimation (JMLE)**  for the Rasch model (1PL). It incorporates some selected **bias correction techniques** and offers **Warm's Weighted Likelihood Estimates (WLE)** for person ability estimation.
 
 ---
 
 ## Features
 
 - Joint Maximum Likelihood Estimation of person abilities \(\theta_p\) and item difficulties \(\beta_i\).
-- Bias correction to reduce estimation bias, including epsilon bias stabilization.
-- Warm's Weighted Likelihood Estimates (WLE) for person abilities.
-- Support for missing data (missing responses coded as `NA`).
-- Verbose mode to trace iteration progress.
-- Comprehensive unit tests for reliability.
+- Bias correction to reduce estimation bias, including epsilon bias stabilization.  
+- Warm's Weighted Likelihood Estimates (WLE) for refined person ability estimates.  
+- Handling of missing data (missing responses coded as `NA`).  
+- Verbose mode for detailed iteration progress monitoring.  
+- Unit testing.  
 
 ---
 
 ## Installation
 
-<!-- Install from CRAN: ```{r, eval = FALSE} install.packages("jmleIRT") ```
+<!-- Install the stable CRAN version with: ```{r, eval = FALSE} install.packages("jmleIRT") ``` -->
 
-Or from GitHub development version:
+Or install the development version from GitHub:
+
 ```{r, eval = FALSE}
 # install.packages("remotes")
 remotes::install_github("jansteinfeld/jmleIRT")
 ```
+
 
 ---
 
@@ -98,14 +100,11 @@ JMLE simultaneously estimates person abilities \(\theta = (\theta_1, \ldots, \th
 L(\theta, \beta) = \prod_{p=1}^P \prod_{i=1}^I P(X_{pi} \mid \theta_p, \beta_i)
 \]
 
-This is typically solved via an iterative algorithm alternating updates for \(\theta_p\) and \(\beta_i\), until convergence criteria are met.
+This is typically solved via an iterative algorithm updating \(\theta_p\) and \(\beta_i\), until convergence criteria are met.
 
 Although easy to implement and computationally efficient, JMLE estimates suffer from bias, especially in small samples or with extreme response patterns.
 
 
-Here is the updated version of the Bias Correction Methods section, formatted for integration into your README or vignette:
-
-***
 
 ## Bias Correction Methods
 

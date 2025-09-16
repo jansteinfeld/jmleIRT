@@ -22,10 +22,10 @@ checks](https://badges.cranchecks.info/summary/jmleIRT.svg)](https://cran.r-proj
 
 ## Overview
 
-The `jmleIRT` package provides tools to estimate Rasch (1PL) model
-parameters using **Joint Maximum Likelihood Estimation (JMLE)** in R.
-The package supports bias correction and Warm’s Weighted Likelihood
-Estimates suitable for psychometric research.
+The `jmleIRT` package includes **Joint Maximum Likelihood Estimation
+(JMLE)** for the Rasch model (1PL). It incorporates some selected **bias
+correction techniques** and offers **Warm’s Weighted Likelihood
+Estimates (WLE)** for person ability estimation.
 
 ------------------------------------------------------------------------
 
@@ -34,18 +34,20 @@ Estimates suitable for psychometric research.
 - Joint Maximum Likelihood Estimation of person abilities $\theta_p$ and
   item difficulties $\beta_i$.
 - Bias correction to reduce estimation bias, including epsilon bias
-  stabilization.
-- Warm’s Weighted Likelihood Estimates (WLE) for person abilities.
-- Support for missing data (missing responses coded as `NA`).
-- Verbose mode to trace iteration progress.
-- Comprehensive unit tests for reliability.
+  stabilization.  
+- Warm’s Weighted Likelihood Estimates (WLE) for refined person ability
+  estimates.  
+- Handling of missing data (missing responses coded as `NA`).  
+- Verbose mode for detailed iteration progress monitoring.  
+- Unit testing.
 
 ------------------------------------------------------------------------
 
 ## Installation
 
+<!-- Install the stable CRAN version with: ```{r, eval = FALSE} install.packages("jmleIRT") ``` -->
 
-Or from GitHub development version:
+Or install the development version from GitHub:
 
 ``` r
 # install.packages("remotes")
@@ -88,7 +90,9 @@ for dichotomous item data. The probability that person $p$ with ability
 $\theta_p$ answers item $i$ with difficulty $\beta_i$ correctly is
 modeled as:
 
-$$P(X_{pi} = 1 \mid \theta_p, \beta_i) = \frac{e^{\theta_p - \beta_i}}{1 + e^{\theta_p - \beta_i}}$$
+$$
+P(X_{pi} = 1 \mid \theta_p, \beta_i) = \frac{e^{\theta_p - \beta_i}}{1 + e^{\theta_p - \beta_i}}
+$$
 
 where $X_{pi} \in \{0,1\}$ indicates the correctness of response.
 
@@ -99,19 +103,16 @@ $\theta = (\theta_1, \ldots, \theta_P)$ and item difficulties
 $\beta = (\beta_1, \ldots, \beta_I)$ by maximizing the joint likelihood
 of observed responses:
 
-$$L(\theta, \beta) = \prod_{p=1}^P \prod_{i=1}^I P(X_{pi} \mid \theta_p, \beta_i)$$
+$$
+L(\theta, \beta) = \prod_{p=1}^P \prod_{i=1}^I P(X_{pi} \mid \theta_p, \beta_i)
+$$
 
-This is typically solved via an iterative algorithm alternating updates
-for $\theta_p$ and $\beta_i$, until convergence criteria are met.
+This is typically solved via an iterative algorithm updating $\theta_p$
+and $\beta_i$, until convergence criteria are met.
 
 Although easy to implement and computationally efficient, JMLE estimates
 suffer from bias, especially in small samples or with extreme response
 patterns.
-
-Here is the updated version of the Bias Correction Methods section,
-formatted for integration into your README or vignette:
-
-------------------------------------------------------------------------
 
 ## Bias Correction Methods
 

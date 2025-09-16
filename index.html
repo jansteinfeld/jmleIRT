@@ -86,7 +86,7 @@
 <div class="section level2">
 <h2 id="overview">Overview<a class="anchor" aria-label="anchor" href="#overview"></a>
 </h2>
-<p>The <code>jmleIRT</code> package provides tools to estimate Rasch (1PL) model parameters using <strong>Joint Maximum Likelihood Estimation (JMLE)</strong> in R. The package supports bias correction and Warm’s Weighted Likelihood Estimates suitable for psychometric research.</p>
+<p>The <code>jmleIRT</code> package includes <strong>Joint Maximum Likelihood Estimation (JMLE)</strong> for the Rasch model (1PL). It incorporates some selected <strong>bias correction techniques</strong> and offers <strong>Warm’s Weighted Likelihood Estimates (WLE)</strong> for person ability estimation.</p>
 <hr>
 </div>
 <div class="section level2">
@@ -94,18 +94,23 @@
 </h2>
 <ul>
 <li>Joint Maximum Likelihood Estimation of person abilities <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>θ</mi><mi>p</mi></msub><annotation encoding="application/x-tex">\theta_p</annotation></semantics></math> and item difficulties <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>β</mi><mi>i</mi></msub><annotation encoding="application/x-tex">\beta_i</annotation></semantics></math>.</li>
-<li>Bias correction to reduce estimation bias, including epsilon bias stabilization.</li>
-<li>Warm’s Weighted Likelihood Estimates (WLE) for person abilities.</li>
-<li>Support for missing data (missing responses coded as <code>NA</code>).</li>
-<li>Verbose mode to trace iteration progress.</li>
-<li>Comprehensive unit tests for reliability.</li>
+<li>Bias correction to reduce estimation bias, including epsilon bias stabilization.<br>
+</li>
+<li>Warm’s Weighted Likelihood Estimates (WLE) for refined person ability estimates.<br>
+</li>
+<li>Handling of missing data (missing responses coded as <code>NA</code>).<br>
+</li>
+<li>Verbose mode for detailed iteration progress monitoring.<br>
+</li>
+<li>Unit testing.</li>
 </ul>
 <hr>
 </div>
 <div class="section level2">
 <h2 id="installation">Installation<a class="anchor" aria-label="anchor" href="#installation"></a>
 </h2>
-<p>Or from GitHub development version:</p>
+<!-- Install the stable CRAN version with: ```{r, eval = FALSE} install.packages("jmleIRT") ``` -->
+<p>Or install the development version from GitHub:</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># install.packages("remotes")</span></span>
 <span><span class="fu">remotes</span><span class="fu">::</span><span class="fu">install_github</span><span class="op">(</span><span class="st">"jansteinfeld/jmleIRT"</span><span class="op">)</span></span></code></pre></div>
@@ -143,18 +148,20 @@
 <h2 id="the-rasch-model">The Rasch Model<a class="anchor" aria-label="anchor" href="#the-rasch-model"></a>
 </h2>
 <p>The Rasch model is a fundamental Item Response Theory (IRT) model used for dichotomous item data. The probability that person <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>p</mi><annotation encoding="application/x-tex">p</annotation></semantics></math> with ability <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>θ</mi><mi>p</mi></msub><annotation encoding="application/x-tex">\theta_p</annotation></semantics></math> answers item <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>i</mi><annotation encoding="application/x-tex">i</annotation></semantics></math> with difficulty <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>β</mi><mi>i</mi></msub><annotation encoding="application/x-tex">\beta_i</annotation></semantics></math> correctly is modeled as:</p>
-<p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>P</mi><mrow><mo stretchy="true" form="prefix">(</mo><msub><mi>X</mi><mrow><mi>p</mi><mi>i</mi></mrow></msub><mo>=</mo><mn>1</mn><mo>∣</mo><msub><mi>θ</mi><mi>p</mi></msub><mo>,</mo><msub><mi>β</mi><mi>i</mi></msub><mo stretchy="true" form="postfix">)</mo></mrow><mo>=</mo><mfrac><msup><mi>e</mi><mrow><msub><mi>θ</mi><mi>p</mi></msub><mo>−</mo><msub><mi>β</mi><mi>i</mi></msub></mrow></msup><mrow><mn>1</mn><mo>+</mo><msup><mi>e</mi><mrow><msub><mi>θ</mi><mi>p</mi></msub><mo>−</mo><msub><mi>β</mi><mi>i</mi></msub></mrow></msup></mrow></mfrac></mrow><annotation encoding="application/x-tex">P(X_{pi} = 1 \mid \theta_p, \beta_i) = \frac{e^{\theta_p - \beta_i}}{1 + e^{\theta_p - \beta_i}}</annotation></semantics></math></p>
+<p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>P</mi><mrow><mo stretchy="true" form="prefix">(</mo><msub><mi>X</mi><mrow><mi>p</mi><mi>i</mi></mrow></msub><mo>=</mo><mn>1</mn><mo>∣</mo><msub><mi>θ</mi><mi>p</mi></msub><mo>,</mo><msub><mi>β</mi><mi>i</mi></msub><mo stretchy="true" form="postfix">)</mo></mrow><mo>=</mo><mfrac><msup><mi>e</mi><mrow><msub><mi>θ</mi><mi>p</mi></msub><mo>−</mo><msub><mi>β</mi><mi>i</mi></msub></mrow></msup><mrow><mn>1</mn><mo>+</mo><msup><mi>e</mi><mrow><msub><mi>θ</mi><mi>p</mi></msub><mo>−</mo><msub><mi>β</mi><mi>i</mi></msub></mrow></msup></mrow></mfrac></mrow><annotation encoding="application/x-tex">
+P(X_{pi} = 1 \mid \theta_p, \beta_i) = \frac{e^{\theta_p - \beta_i}}{1 + e^{\theta_p - \beta_i}}
+</annotation></semantics></math></p>
 <p>where <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>X</mi><mrow><mi>p</mi><mi>i</mi></mrow></msub><mo>∈</mo><mo stretchy="false" form="prefix">{</mo><mn>0</mn><mo>,</mo><mn>1</mn><mo stretchy="false" form="postfix">}</mo></mrow><annotation encoding="application/x-tex">X_{pi} \in \{0,1\}</annotation></semantics></math> indicates the correctness of response.</p>
 </div>
 <div class="section level2">
 <h2 id="joint-maximum-likelihood-estimation-jmle">Joint Maximum Likelihood Estimation (JMLE)<a class="anchor" aria-label="anchor" href="#joint-maximum-likelihood-estimation-jmle"></a>
 </h2>
 <p>JMLE simultaneously estimates person abilities <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>θ</mi><mo>=</mo><mrow><mo stretchy="true" form="prefix">(</mo><msub><mi>θ</mi><mn>1</mn></msub><mo>,</mo><mi>…</mi><mo>,</mo><msub><mi>θ</mi><mi>P</mi></msub><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">\theta = (\theta_1, \ldots, \theta_P)</annotation></semantics></math> and item difficulties <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>β</mi><mo>=</mo><mrow><mo stretchy="true" form="prefix">(</mo><msub><mi>β</mi><mn>1</mn></msub><mo>,</mo><mi>…</mi><mo>,</mo><msub><mi>β</mi><mi>I</mi></msub><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">\beta = (\beta_1, \ldots, \beta_I)</annotation></semantics></math> by maximizing the joint likelihood of observed responses:</p>
-<p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>L</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>θ</mi><mo>,</mo><mi>β</mi><mo stretchy="true" form="postfix">)</mo></mrow><mo>=</mo><munderover><mo>∏</mo><mrow><mi>p</mi><mo>=</mo><mn>1</mn></mrow><mi>P</mi></munderover><munderover><mo>∏</mo><mrow><mi>i</mi><mo>=</mo><mn>1</mn></mrow><mi>I</mi></munderover><mi>P</mi><mrow><mo stretchy="true" form="prefix">(</mo><msub><mi>X</mi><mrow><mi>p</mi><mi>i</mi></mrow></msub><mo>∣</mo><msub><mi>θ</mi><mi>p</mi></msub><mo>,</mo><msub><mi>β</mi><mi>i</mi></msub><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">L(\theta, \beta) = \prod_{p=1}^P \prod_{i=1}^I P(X_{pi} \mid \theta_p, \beta_i)</annotation></semantics></math></p>
-<p>This is typically solved via an iterative algorithm alternating updates for <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>θ</mi><mi>p</mi></msub><annotation encoding="application/x-tex">\theta_p</annotation></semantics></math> and <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>β</mi><mi>i</mi></msub><annotation encoding="application/x-tex">\beta_i</annotation></semantics></math>, until convergence criteria are met.</p>
+<p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>L</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>θ</mi><mo>,</mo><mi>β</mi><mo stretchy="true" form="postfix">)</mo></mrow><mo>=</mo><munderover><mo>∏</mo><mrow><mi>p</mi><mo>=</mo><mn>1</mn></mrow><mi>P</mi></munderover><munderover><mo>∏</mo><mrow><mi>i</mi><mo>=</mo><mn>1</mn></mrow><mi>I</mi></munderover><mi>P</mi><mrow><mo stretchy="true" form="prefix">(</mo><msub><mi>X</mi><mrow><mi>p</mi><mi>i</mi></mrow></msub><mo>∣</mo><msub><mi>θ</mi><mi>p</mi></msub><mo>,</mo><msub><mi>β</mi><mi>i</mi></msub><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">
+L(\theta, \beta) = \prod_{p=1}^P \prod_{i=1}^I P(X_{pi} \mid \theta_p, \beta_i)
+</annotation></semantics></math></p>
+<p>This is typically solved via an iterative algorithm updating <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>θ</mi><mi>p</mi></msub><annotation encoding="application/x-tex">\theta_p</annotation></semantics></math> and <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>β</mi><mi>i</mi></msub><annotation encoding="application/x-tex">\beta_i</annotation></semantics></math>, until convergence criteria are met.</p>
 <p>Although easy to implement and computationally efficient, JMLE estimates suffer from bias, especially in small samples or with extreme response patterns.</p>
-<p>Here is the updated version of the Bias Correction Methods section, formatted for integration into your README or vignette:</p>
-<hr>
 </div>
 <div class="section level2">
 <h2 id="bias-correction-methods">Bias Correction Methods<a class="anchor" aria-label="anchor" href="#bias-correction-methods"></a>

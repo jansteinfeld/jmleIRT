@@ -7,9 +7,9 @@ authors:
   - name: Alexander Robitzsch
     url: https://sites.google.com/view/alexander-robitzsch/home
 template:
+  light-switch: true
   bootswatch: sketchy
   bootstrap: 5
-  light-switch: true
 theme: dark
 # bootswatch: Brite bootswatch 5 themes
 # Quartz theme
@@ -21,13 +21,13 @@ toc:
 navbar:
   structure:
     left: [home, reference, articles, news]
-    right: [github]
-  components:
-    github:
-      icon: fab fa-github
-      href: jansteinfeld.github.io/jmleIRT
-      text: GitHub
-      class: btn btn-primary
-      float: right
-      align: right
-      style: "margin-top: 8px; margin-bottom: 8px; margin-right: 15px;"
+    right: [search, github, lightswitch]
+  # components:
+  #   github:
+  #     icon: fab fa-github
+  #     # href: jansteinfeld.github.io/jmleIRT
+  #     text: GitHub
+  #     class: btn btn-primary
+  #     float: right
+  #     align: right
+  #     style: "margin-top: 8px; margin-bottom: 8px; margin-right: 15px;"

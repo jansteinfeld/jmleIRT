@@ -1,7 +1,7 @@
 Package: jmleIRT
 Title: Joint Maximum Likelihood Estimation of the Rasch Model
-Version: 0.0.2-0
-Date: 2025-09-05
+Version: 0.0.2-1
+Date: 2025-09-23
 Authors@R: c(
   person(given = "Jan", 
          family = "Steinfeld", 

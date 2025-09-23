@@ -170,4 +170,5 @@ GPL-3
 
 ------------------------------------------------------------------------
 
-Contributions welcome via GitHub: \[jansteinfeld/jmleIRT\].
+Contributions welcome via GitHub:
+[jansteinfeld/jmleIRT](https://github.com/jansteinfeld/jmleIRT).

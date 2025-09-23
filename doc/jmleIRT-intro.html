@@ -12,7 +12,7 @@
 
 <meta name="author" content="Jan Steinfeld &amp; Alexander Robitzsch" />
 
-<meta name="date" content="2025-09-16" />
+<meta name="date" content="2025-09-23" />
 
 <title>First steps with the Package jmleIRT</title>
 
@@ -143,7 +143,7 @@ pointer-events: auto;
 jmleIRT</h1>
 <h4 class="author project-author">Jan Steinfeld &amp; Alexander
 Robitzsch</h4>
-<h4 class="date project-date">September 16, 2025</h4>
+<h4 class="date project-date">September 23, 2025</h4>
 </section>
 
 
@@ -214,12 +214,12 @@ optimization in C++.</p>
 <span id="cb1-5"><a href="#cb1-5" tabindex="-1"></a>X[<span class="fu">sample</span>(<span class="fu">length</span>(X), <span class="at">size =</span> <span class="fl">0.1</span> <span class="sc">*</span> <span class="fu">length</span>(X))] <span class="ot">&lt;-</span> <span class="cn">NA</span></span>
 <span id="cb1-6"><a href="#cb1-6" tabindex="-1"></a><span class="fu">head</span>(X)</span>
 <span id="cb1-7"><a href="#cb1-7" tabindex="-1"></a><span class="co">#&gt;      [,1] [,2] [,3] [,4] [,5] [,6] [,7] [,8] [,9] [,10]</span></span>
-<span id="cb1-8"><a href="#cb1-8" tabindex="-1"></a><span class="co">#&gt; [1,]    0    1    0    0    1    1    1    0    0     0</span></span>
-<span id="cb1-9"><a href="#cb1-9" tabindex="-1"></a><span class="co">#&gt; [2,]    1    0    0    0   NA    0    0   NA    0     1</span></span>
-<span id="cb1-10"><a href="#cb1-10" tabindex="-1"></a><span class="co">#&gt; [3,]    1    1    1    0    0    0    0   NA    1     0</span></span>
-<span id="cb1-11"><a href="#cb1-11" tabindex="-1"></a><span class="co">#&gt; [4,]    0   NA    0    1    0    0    0    1    1     0</span></span>
-<span id="cb1-12"><a href="#cb1-12" tabindex="-1"></a><span class="co">#&gt; [5,]    0    1    1    0    0    1    0    1    1     1</span></span>
-<span id="cb1-13"><a href="#cb1-13" tabindex="-1"></a><span class="co">#&gt; [6,]    0    1    0    0    1    0    1    1    1     1</span></span></code></pre></div>
+<span id="cb1-8"><a href="#cb1-8" tabindex="-1"></a><span class="co">#&gt; [1,]    1    1    0    1    1    0    0    1    1     0</span></span>
+<span id="cb1-9"><a href="#cb1-9" tabindex="-1"></a><span class="co">#&gt; [2,]    1    1    0    1   NA    0    1    0    0     1</span></span>
+<span id="cb1-10"><a href="#cb1-10" tabindex="-1"></a><span class="co">#&gt; [3,]    1    1   NA    1    1    1    1    1    0     0</span></span>
+<span id="cb1-11"><a href="#cb1-11" tabindex="-1"></a><span class="co">#&gt; [4,]    0    1    1    0    1    1    0   NA    0     0</span></span>
+<span id="cb1-12"><a href="#cb1-12" tabindex="-1"></a><span class="co">#&gt; [5,]    0    0    1   NA    0    0    1    1    1     1</span></span>
+<span id="cb1-13"><a href="#cb1-13" tabindex="-1"></a><span class="co">#&gt; [6,]    0    0    1    0    0    1    1   NA    0     1</span></span></code></pre></div>
 </div>
 <div id="basic-jml-estimation" class="section level2" number="5.2">
 <h2><span class="header-section-number">5.2</span> Basic JML
@@ -233,8 +233,8 @@ Estimation</h2>
 <span id="cb2-6"><a href="#cb2-6" tabindex="-1"></a></span>
 <span id="cb2-7"><a href="#cb2-7" tabindex="-1"></a><span class="fu">str</span>(fit)</span>
 <span id="cb2-8"><a href="#cb2-8" tabindex="-1"></a><span class="co">#&gt; List of 7</span></span>
-<span id="cb2-9"><a href="#cb2-9" tabindex="-1"></a><span class="co">#&gt;  $ theta          : num [1:100] -0.371 -1.088 -0.17 -0.662 0.453 ...</span></span>
-<span id="cb2-10"><a href="#cb2-10" tabindex="-1"></a><span class="co">#&gt;  $ beta           : num [1:10] -0.457 -0.021 0.492 0.116 0.24 ...</span></span>
+<span id="cb2-9"><a href="#cb2-9" tabindex="-1"></a><span class="co">#&gt;  $ theta          : num [1:100] 0.391 0.213 1.235 -0.217 0.179 ...</span></span>
+<span id="cb2-10"><a href="#cb2-10" tabindex="-1"></a><span class="co">#&gt;  $ beta           : num [1:10] -0.2861 -0.2939 0.0912 0.25 -0.0501 ...</span></span>
 <span id="cb2-11"><a href="#cb2-11" tabindex="-1"></a><span class="co">#&gt;  $ iterations     : int 500</span></span>
 <span id="cb2-12"><a href="#cb2-12" tabindex="-1"></a><span class="co">#&gt;  $ converged      : logi FALSE</span></span>
 <span id="cb2-13"><a href="#cb2-13" tabindex="-1"></a><span class="co">#&gt;  $ bias_correction: logi FALSE</span></span>
@@ -258,12 +258,12 @@ Estimation</h2>
 <p>Bias correction rescales item difficulty estimates.</p>
 <div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" tabindex="-1"></a>fit_bc <span class="ot">&lt;-</span> <span class="fu">jmle_estimation</span>(X, <span class="at">center =</span> <span class="st">&quot;items&quot;</span>, <span class="at">bias_correction =</span> <span class="cn">TRUE</span>)</span>
 <span id="cb3-2"><a href="#cb3-2" tabindex="-1"></a><span class="fu">summary</span>(fit_bc<span class="sc">$</span>beta)</span>
-<span id="cb3-3"><a href="#cb3-3" tabindex="-1"></a><span class="co">#&gt;      Min.   1st Qu.    Median      Mean   3rd Qu.      Max. </span></span>
-<span id="cb3-4"><a href="#cb3-4" tabindex="-1"></a><span class="co">#&gt; -0.411707 -0.112605  0.005149  0.000000  0.116540  0.442970</span></span></code></pre></div>
+<span id="cb3-3"><a href="#cb3-3" tabindex="-1"></a><span class="co">#&gt;     Min.  1st Qu.   Median     Mean  3rd Qu.     Max. </span></span>
+<span id="cb3-4"><a href="#cb3-4" tabindex="-1"></a><span class="co">#&gt; -0.26448 -0.16918  0.08642  0.00000  0.12226  0.22498</span></span></code></pre></div>
 <p>Compare to the uncorrected version:</p>
 <div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" tabindex="-1"></a><span class="fu">summary</span>(fit<span class="sc">$</span>beta)</span>
-<span id="cb4-2"><a href="#cb4-2" tabindex="-1"></a><span class="co">#&gt;      Min.   1st Qu.    Median      Mean   3rd Qu.      Max. </span></span>
-<span id="cb4-3"><a href="#cb4-3" tabindex="-1"></a><span class="co">#&gt; -0.457452 -0.125116  0.005721  0.000000  0.129489  0.492189</span></span></code></pre></div>
+<span id="cb4-2"><a href="#cb4-2" tabindex="-1"></a><span class="co">#&gt;     Min.  1st Qu.   Median     Mean  3rd Qu.     Max. </span></span>
+<span id="cb4-3"><a href="#cb4-3" tabindex="-1"></a><span class="co">#&gt; -0.29387 -0.18798  0.09602  0.00000  0.13585  0.24998</span></span></code></pre></div>
 </div>
 <div id="warms-wle-estimates" class="section level2" number="5.4">
 <h2><span class="header-section-number">5.4</span> Warm’s WLE
@@ -272,7 +272,7 @@ Estimates</h2>
 JML estimates.</p>
 <div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" tabindex="-1"></a>fit_wle <span class="ot">&lt;-</span> <span class="fu">jmle_estimation</span>(X, <span class="at">center =</span> <span class="st">&quot;items&quot;</span>, <span class="at">estimatewle =</span> <span class="cn">TRUE</span>)</span>
 <span id="cb5-2"><a href="#cb5-2" tabindex="-1"></a><span class="fu">head</span>(fit_wle<span class="sc">$</span>wle_estimate)</span>
-<span id="cb5-3"><a href="#cb5-3" tabindex="-1"></a><span class="co">#&gt; [1] -0.3748915 -0.9870330 -0.1882532 -0.6300289  0.3748667  0.3748667</span></span></code></pre></div>
+<span id="cb5-3"><a href="#cb5-3" tabindex="-1"></a><span class="co">#&gt; [1]  0.3719959  0.2091482  1.1004273 -0.1761675  0.1751840 -0.1761675</span></span></code></pre></div>
 </div>
 <div id="handling-missing-data" class="section level2" number="5.5">
 <h2><span class="header-section-number">5.5</span> Handling Missing

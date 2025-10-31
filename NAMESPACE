@@ -3,6 +3,7 @@
 S3method(summary,jmleIRT)
 export(estimate_rasch_model)
 export(jmle_estimation)
+export(prox_algorithm)
 export(wle_estimation)
 importFrom(Rcpp,sourceCpp)
 importFrom(stats,sd)

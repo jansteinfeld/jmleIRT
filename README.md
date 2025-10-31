@@ -90,9 +90,7 @@ for dichotomous item data. The probability that person $p$ with ability
 $\theta_p$ answers item $i$ with difficulty $\beta_i$ correctly is
 modeled as:
 
-$$
-P(X_{pi} = 1 \mid \theta_p, \beta_i) = \frac{e^{\theta_p - \beta_i}}{1 + e^{\theta_p - \beta_i}}
-$$
+$$P(X_{pi} = 1 \mid \theta_p, \beta_i) = \frac{e^{\theta_p - \beta_i}}{1 + e^{\theta_p - \beta_i}}$$
 
 where $X_{pi} \in \{0,1\}$ indicates the correctness of response.
 
@@ -103,9 +101,7 @@ $\theta = (\theta_1, \ldots, \theta_P)$ and item difficulties
 $\beta = (\beta_1, \ldots, \beta_I)$ by maximizing the joint likelihood
 of observed responses:
 
-$$
-L(\theta, \beta) = \prod_{p=1}^P \prod_{i=1}^I P(X_{pi} \mid \theta_p, \beta_i)
-$$
+$$L(\theta, \beta) = \prod_{p=1}^P \prod_{i=1}^I P(X_{pi} \mid \theta_p, \beta_i)$$
 
 This is typically solved via an iterative algorithm updating $\theta_p$
 and $\beta_i$, until convergence criteria are met.

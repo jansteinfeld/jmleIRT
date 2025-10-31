@@ -48,10 +48,26 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// prox_rasch
+List prox_rasch(NumericMatrix dat, NumericMatrix dat_resp, NumericVector freq, double conv, int maxiter);
+RcppExport SEXP _jmleIRT_prox_rasch(SEXP datSEXP, SEXP dat_respSEXP, SEXP freqSEXP, SEXP convSEXP, SEXP maxiterSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< NumericMatrix >::type dat(datSEXP);
+    Rcpp::traits::input_parameter< NumericMatrix >::type dat_resp(dat_respSEXP);
+    Rcpp::traits::input_parameter< NumericVector >::type freq(freqSEXP);
+    Rcpp::traits::input_parameter< double >::type conv(convSEXP);
+    Rcpp::traits::input_parameter< int >::type maxiter(maxiterSEXP);
+    rcpp_result_gen = Rcpp::wrap(prox_rasch(dat, dat_resp, freq, conv, maxiter));
+    return rcpp_result_gen;
+END_RCPP
+}
 
 static const R_CallMethodDef CallEntries[] = {
     {"_jmleIRT_estimate_wle", (DL_FUNC) &_jmleIRT_estimate_wle, 7},
     {"_jmleIRT_estimate_jmle", (DL_FUNC) &_jmleIRT_estimate_jmle, 10},
+    {"_jmleIRT_prox_rasch", (DL_FUNC) &_jmleIRT_prox_rasch, 5},
     {NULL, NULL, 0}
 };
 

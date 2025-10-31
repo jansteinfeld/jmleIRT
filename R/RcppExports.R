@@ -9,3 +9,7 @@ estimate_jmle <- function(X_, max_iter = 1000L, conv = 1e-6, eps = 0.0, bias_cor
     .Call(`_jmleIRT_estimate_jmle`, X_, max_iter, conv, eps, bias_correction, center, max_update, verbose, estimatewle, wle_adj)
 }
 
+prox_rasch <- function(dat, dat_resp, freq, conv = 0.001, maxiter = 30L) {
+    .Call(`_jmleIRT_prox_rasch`, dat, dat_resp, freq, conv, maxiter)
+}
+

@@ -20,7 +20,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">jmleIRT</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.0.2-3</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.0.2-7</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -68,7 +68,7 @@
                         <h4 data-toc-skip class="author">Jan Steinfeld
 &amp; Alexander Robitzsch</h4>
             
-            <h4 data-toc-skip class="date">October 31, 2025</h4>
+            <h4 data-toc-skip class="date">November 07, 2025</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/jansteinfeld/jmleIRT/blob/main/vignettes/jmleIRT-intro.Rmd" class="external-link"><code>vignettes/jmleIRT-intro.Rmd</code></a></small>
       <div class="d-none name"><code>jmleIRT-intro.Rmd</code></div>
@@ -179,8 +179,9 @@ optimization in C++.</p>
 <span><span class="op">)</span></span>
 <span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/utils/str.html" class="external-link">str</a></span><span class="op">(</span><span class="va">fit</span><span class="op">)</span></span>
-<span><span class="co">#&gt; List of 7</span></span>
-<span><span class="co">#&gt;  $ theta          : num [1:100] -0.466 0.364 -0.466 0.364 -1.86 ...</span></span>
+<span><span class="co">#&gt; List of 8</span></span>
+<span><span class="co">#&gt;  $ data           : num [1:100, 1:10] 0 1 1 0 NA 0 0 0 1 NA ...</span></span>
+<span><span class="co">#&gt;  $ theta          : num [1:100] -0.479 0.35 -0.479 0.35 -1.873 ...</span></span>
 <span><span class="co">#&gt;  $ beta           : num [1:10] 0.472 -0.494 -0.216 -0.269 0.124 ...</span></span>
 <span><span class="co">#&gt;  $ iterations     : int 500</span></span>
 <span><span class="co">#&gt;  $ converged      : logi FALSE</span></span>
@@ -215,12 +216,12 @@ optimization in C++.</p>
 <code class="sourceCode R"><span><span class="va">fit_bc</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/jmle_estimation.html">jmle_estimation</a></span><span class="op">(</span><span class="va">X</span>, center <span class="op">=</span> <span class="st">"items"</span>, bias_correction <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">fit_bc</span><span class="op">$</span><span class="va">beta</span><span class="op">)</span></span>
 <span><span class="co">#&gt;      Min.   1st Qu.    Median      Mean   3rd Qu.      Max. </span></span>
-<span><span class="co">#&gt; -0.444923 -0.230269  0.009095  0.000000  0.234489  0.424776</span></span></code></pre></div>
+<span><span class="co">#&gt; -0.444768 -0.230188  0.009092  0.000000  0.234406  0.424626</span></span></code></pre></div>
 <p>Compare to the uncorrected version:</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">fit</span><span class="op">$</span><span class="va">beta</span><span class="op">)</span></span>
-<span><span class="co">#&gt;     Min.  1st Qu.   Median     Mean  3rd Qu.     Max. </span></span>
-<span><span class="co">#&gt; -0.49436 -0.25585  0.01011  0.00000  0.26054  0.47197</span></span></code></pre></div>
+<span><span class="co">#&gt;    Min. 1st Qu.  Median    Mean 3rd Qu.    Max. </span></span>
+<span><span class="co">#&gt; -0.4942 -0.2558  0.0101  0.0000  0.2605  0.4718</span></span></code></pre></div>
 </div>
 <div class="section level3">
 <h3 id="warms-wle-estimates">Warm’s WLE Estimates<a class="anchor" aria-label="anchor" href="#warms-wle-estimates"></a>
@@ -230,7 +231,7 @@ JML estimates.</p>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">fit_wle</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/jmle_estimation.html">jmle_estimation</a></span><span class="op">(</span><span class="va">X</span>, center <span class="op">=</span> <span class="st">"items"</span>, estimatewle <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">fit_wle</span><span class="op">$</span><span class="va">wle_estimate</span><span class="op">)</span></span>
-<span><span class="co">#&gt; [1] -0.3779268  0.3781344 -0.3779268  0.3781344 -1.4876481 -0.3779268</span></span></code></pre></div>
+<span><span class="co">#&gt; [1] -0.3779197  0.3781271 -0.3779197  0.3781271 -1.4876295 -0.3779197</span></span></code></pre></div>
 </div>
 <div class="section level3">
 <h3 id="handling-missing-data">Handling Missing Data<a class="anchor" aria-label="anchor" href="#handling-missing-data"></a>

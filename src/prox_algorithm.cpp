@@ -2,7 +2,7 @@
 #include <cmath>
 using namespace Rcpp;
 
-// Safe logit transform
+// transform to logit scale with safety bounds
 inline double safe_logit(double p)
 {
   constexpr double lower = 1e-6;
@@ -79,6 +79,7 @@ List prox_rasch(NumericMatrix dat,
   NumericVector logit_freq_i(I);
   NumericVector logit_freq_n(IP);
 
+  // Initial calculations of sufficient statistics and logit frequencies
   for (int j = 0; j < I; j++)
   {
     double sum_s = 0.0, sum_n = 0.0;

@@ -34,7 +34,7 @@ test_that("jmle_estimation throws errors on invalid input", {
 test_that(" summary works and prints correct output", {
   res <- jmle_estimation(X, center="items")
   # assuming a summary.jmleIRT method exists
-  expect_output(summary(res), "Joint Maximum Likelihood Estimation of Rasch Model")
+  expect_output(summary(res), "Summary of JMLE Rasch Model Estimation")
 })
 
 test_that("wle_estimation returns sensible output", {

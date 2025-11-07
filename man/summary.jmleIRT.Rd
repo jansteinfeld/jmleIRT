@@ -4,14 +4,14 @@
 \alias{summary.jmleIRT}
 \title{Summary of JML estimation}
 \usage{
-\method{summary}{jmleIRT}(object, digits = 4, ...)
+\method{summary}{jmleIRT}(object, ...)
 }
 \arguments{
 \item{object}{An object of class "jmleIRT" containing numeric vectors `theta` and `beta`. If not a strict fit object, it must still provide `theta` and `beta` accessible as `object$theta` and `object$beta`.}
 
-\item{digits}{Number of digits to display (default is 4).}
-
 \item{...}{Further arguments passed to or used by methods (currently unused).}
+
+\item{digits}{Number of digits to display (default is 4).}
 }
 \value{
 The input object, returned invisibly.

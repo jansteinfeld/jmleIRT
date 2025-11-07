@@ -11,6 +11,21 @@ Rcpp::Rostream<true>&  Rcpp::Rcout = Rcpp::Rcpp_cout_get();
 Rcpp::Rostream<false>& Rcpp::Rcerr = Rcpp::Rcpp_cerr_get();
 #endif
 
+// biasCorrectionJMLE
+Rcpp::List biasCorrectionJMLE(NumericVector& theta, NumericVector& beta, const NumericMatrix& X, int N, int I);
+RcppExport SEXP _jmleIRT_biasCorrectionJMLE(SEXP thetaSEXP, SEXP betaSEXP, SEXP XSEXP, SEXP NSEXP, SEXP ISEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< NumericVector& >::type theta(thetaSEXP);
+    Rcpp::traits::input_parameter< NumericVector& >::type beta(betaSEXP);
+    Rcpp::traits::input_parameter< const NumericMatrix& >::type X(XSEXP);
+    Rcpp::traits::input_parameter< int >::type N(NSEXP);
+    Rcpp::traits::input_parameter< int >::type I(ISEXP);
+    rcpp_result_gen = Rcpp::wrap(biasCorrectionJMLE(theta, beta, X, N, I));
+    return rcpp_result_gen;
+END_RCPP
+}
 // estimate_wle
 Rcpp::List estimate_wle(SEXP X_, Rcpp::NumericVector beta, int max_iter, double tol, double lower_ext, double upper_ext, double wle_adj);
 RcppExport SEXP _jmleIRT_estimate_wle(SEXP X_SEXP, SEXP betaSEXP, SEXP max_iterSEXP, SEXP tolSEXP, SEXP lower_extSEXP, SEXP upper_extSEXP, SEXP wle_adjSEXP) {
@@ -65,6 +80,7 @@ END_RCPP
 }
 
 static const R_CallMethodDef CallEntries[] = {
+    {"_jmleIRT_biasCorrectionJMLE", (DL_FUNC) &_jmleIRT_biasCorrectionJMLE, 5},
     {"_jmleIRT_estimate_wle", (DL_FUNC) &_jmleIRT_estimate_wle, 7},
     {"_jmleIRT_estimate_jmle", (DL_FUNC) &_jmleIRT_estimate_jmle, 10},
     {"_jmleIRT_prox_rasch", (DL_FUNC) &_jmleIRT_prox_rasch, 5},

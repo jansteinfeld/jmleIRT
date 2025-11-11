@@ -60,11 +60,11 @@ estimators of person (theta) and item (beta) parameters in the Rasch model.</p>
 
 
 <dl><dt id="arg-theta">theta<a class="anchor" aria-label="anchor" href="#arg-theta"></a></dt>
-<dd><p>Numeric vector of estimated person parameters \(\).</p></dd>
+<dd><p>Numeric vector of estimated person parameters \(\hat{\theta}\).</p></dd>
 
 
 <dt id="arg-beta">beta<a class="anchor" aria-label="anchor" href="#arg-beta"></a></dt>
-<dd><p>Numeric vector of estimated item parameters \(\).</p></dd>
+<dd><p>Numeric vector of estimated item parameters \(\hat{\beta}\).</p></dd>
 
 
 <dt id="arg-x">X<a class="anchor" aria-label="anchor" href="#arg-x"></a></dt>
@@ -87,21 +87,21 @@ estimators of person (theta) and item (beta) parameters in the Rasch model.</p>
 </dl></div>
     <div class="section level2">
     <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>
-    <p>The JML estimators are well-known to suffer from incidental parameter bias when the number of items (I)
+    <p>The JML estimators are well-known to suffer from incidental parameter bias when the number of items (\(I\))
 is finite, resulting in biased parameter estimates. This bias is generally of order \(1/I\).</p>
 <p>The bias correction implemented here follows the first-order analytic correction approach,
 which approximates the bias term \(B\) for each parameter as:
 $$
 \hat{\theta}^{corr} = \hat{\theta} - \frac{1}{I} \hat{B}_{\theta}, \quad
-\hat{\beta}^{corr} = \hat{\beta} - \frac{1}{I} \hat{B}_{\beta},
+\hat{\beta}^{corr} = \hat{\beta} - \frac{1}{I} \hat{B}_{\beta}
 $$
-where \(B\) is estimated based on the observed scores \(u_i\) and the expected Fisher information \(v_i\),
+where \(\hat{B}\) is estimated based on the observed scores \(u_i\) and the expected Fisher information \(v_i\),
 calculated as
 $$
 \hat{B}_i \approx \frac{E[v_i u_i]}{E[v_i^2]}.
 $$
 In this implementation, scores and information are calculated based on the logistic form of the Rasch model,
-where \(p_ni = e^_n - _i1 + e^_n - _i\) is the probability that person \(n\)
+where \(p_{ni} = \frac{e^{\theta_n - \beta_i}}{1 + e^{\theta_n - \beta_i}}\) is the probability that person \(n\)
 correctly answers item \(i\).</p>
 <p>Missing responses (NA) in the data matrix \(X\) are handled by omitting those entries.</p>
 
@@ -113,13 +113,13 @@ the number of observations per parameter is limited.</p>
 of the log-likelihood of the Rasch model likelihood function, evaluated at the JML estimates.</p>
 <p>The estimator reduces bias by estimating expected score and information terms:
 $$
-u_{ni} = X_{ni} - p_{ni}, \quad v_{ni} = p_{ni} (1 - p_{ni}),
+u_{ni} = X_{ni} - p_{ni}, \quad v_{ni} = p_{ni} (1 - p_{ni})
 $$
 for person \(n\) and item \(i\), and then aggregating these across items or persons.</p>
 <p>The bias terms for person \(n\) and item \(i\) are estimated as:
 $$
 \hat{B}_{\theta,n} = \frac{\sum_i v_{ni} u_{ni}}{\sum_i v_{ni}^2}, \quad
-\hat{B}_{\beta,i} = \frac{\sum_n v_{ni} (p_{ni} - X_{ni})}{\sum_n v_{ni}^2}.
+\hat{B}_{\beta,i} = \frac{\sum_n v_{ni} (p_{ni} - X_{ni})}{\sum_n v_{ni}^2}
 $$</p>
 <p>This method is applicable when the number of items \(I\) is fixed and moderate, and
 the number of persons \(N\) is large.</p>

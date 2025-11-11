@@ -11,16 +11,16 @@
 ## Citation
 
 Source:
-[`DESCRIPTION`](https://github.com/jansteinfeld/jmleIRT/blob/main/DESCRIPTION)
+[`inst/CITATION`](https://github.com/jansteinfeld/jmleIRT/blob/main/inst/CITATION)
 
-Steinfeld J, Robitzsch A (2025). *jmleIRT: Joint Maximum Likelihood
-Estimation of the Rasch Model*. R package version 0.0.2-7,
-<https://jansteinfeld.github.io/jmleIRT/>.
+Steinfeld, J. and Robitzsch, A. (2025). jmleIRT: {J}oint Maximum
+Likelihood Estimation of the Rasch Model. R package version
+0.0.2-7https://CRAN.R-project.org/package=jmleIRT
 
     @Manual{,
-      title = {jmleIRT: Joint Maximum Likelihood Estimation of the Rasch Model},
+      title = {jmleIRT: {J}oint Maximum Likelihood Estimation of the Rasch Model},
       author = {Jan Steinfeld and Alexander Robitzsch},
       year = {2025},
       note = {R package version 0.0.2-7},
-      url = {https://jansteinfeld.github.io/jmleIRT/},
+      url = {https://CRAN.R-project.org/package=jmleIRT},
     }

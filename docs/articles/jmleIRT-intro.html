@@ -68,7 +68,7 @@
                         <h4 data-toc-skip class="author">Jan Steinfeld
 &amp; Alexander Robitzsch</h4>
             
-            <h4 data-toc-skip class="date">November 07, 2025</h4>
+            <h4 data-toc-skip class="date">November 10, 2025</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/jansteinfeld/jmleIRT/blob/HEAD/vignettes/jmleIRT-intro.Rmd" class="external-link"><code>vignettes/jmleIRT-intro.Rmd</code></a></small>
       <div class="d-none name"><code>jmleIRT-intro.Rmd</code></div>
@@ -95,7 +95,7 @@ and item
 the Rasch model posits the probability of a correct response
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>X</mi><mrow><mi>p</mi><mi>i</mi></mrow></msub><annotation encoding="application/x-tex">X_{pi}</annotation></semantics></math>
 as:</p>
-<p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>P</mi><mo stretchy="false" form="prefix">(</mo><msub><mi>X</mi><mrow><mi>p</mi><mi>i</mi></mrow></msub><mo>=</mo><mn>1</mn><mo>∣</mo><msub><mi>θ</mi><mi>p</mi></msub><mo>,</mo><msub><mi>β</mi><mi>i</mi></msub><mo stretchy="false" form="postfix">)</mo><mo>=</mo><mfrac><mrow><mrow><mi mathvariant="normal">exp</mi><mo>⁡</mo></mrow><mo stretchy="false" form="prefix">(</mo><msub><mi>θ</mi><mi>p</mi></msub><mo>−</mo><msub><mi>β</mi><mi>i</mi></msub><mo stretchy="false" form="postfix">)</mo></mrow><mrow><mn>1</mn><mo>+</mo><mrow><mi mathvariant="normal">exp</mi><mo>⁡</mo></mrow><mo stretchy="false" form="prefix">(</mo><msub><mi>θ</mi><mi>p</mi></msub><mo>−</mo><msub><mi>β</mi><mi>i</mi></msub><mo stretchy="false" form="postfix">)</mo></mrow></mfrac></mrow><annotation encoding="application/x-tex">
+<p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>P</mi><mrow><mo stretchy="true" form="prefix">(</mo><msub><mi>X</mi><mrow><mi>p</mi><mi>i</mi></mrow></msub><mo>=</mo><mn>1</mn><mo>∣</mo><msub><mi>θ</mi><mi>p</mi></msub><mo>,</mo><msub><mi>β</mi><mi>i</mi></msub><mo stretchy="true" form="postfix">)</mo></mrow><mo>=</mo><mfrac><mrow><mo>exp</mo><mrow><mo stretchy="true" form="prefix">(</mo><msub><mi>θ</mi><mi>p</mi></msub><mo>−</mo><msub><mi>β</mi><mi>i</mi></msub><mo stretchy="true" form="postfix">)</mo></mrow></mrow><mrow><mn>1</mn><mo>+</mo><mo>exp</mo><mrow><mo stretchy="true" form="prefix">(</mo><msub><mi>θ</mi><mi>p</mi></msub><mo>−</mo><msub><mi>β</mi><mi>i</mi></msub><mo stretchy="true" form="postfix">)</mo></mrow></mrow></mfrac></mrow><annotation encoding="application/x-tex">
 P(X_{pi} = 1 \mid \theta_p, \beta_i) = \frac{\exp(\theta_p - \beta_i)}{1 + \exp(\theta_p - \beta_i)}
 </annotation></semantics></math></p>
 <p>where
@@ -111,7 +111,7 @@ the difficulty of item
 <h2 id="joint-maximum-likelihood-estimation">Joint Maximum Likelihood Estimation<a class="anchor" aria-label="anchor" href="#joint-maximum-likelihood-estimation"></a>
 </h2>
 <p>The joint likelihood across all persons and items is</p>
-<p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>L</mi><mo stretchy="false" form="prefix">(</mo><mi>θ</mi><mo>,</mo><mi>β</mi><mo stretchy="false" form="postfix">)</mo><mo>=</mo><munderover><mo>∏</mo><mrow><mi>p</mi><mo>=</mo><mn>1</mn></mrow><mi>P</mi></munderover><munderover><mo>∏</mo><mrow><mi>i</mi><mo>=</mo><mn>1</mn></mrow><mi>I</mi></munderover><mi>P</mi><mo stretchy="false" form="prefix">(</mo><msub><mi>X</mi><mrow><mi>p</mi><mi>i</mi></mrow></msub><mo>∣</mo><msub><mi>θ</mi><mi>p</mi></msub><mo>,</mo><msub><mi>β</mi><mi>i</mi></msub><mo stretchy="false" form="postfix">)</mo></mrow><annotation encoding="application/x-tex">
+<p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>L</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>θ</mi><mo>,</mo><mi>β</mi><mo stretchy="true" form="postfix">)</mo></mrow><mo>=</mo><munderover><mo>∏</mo><mrow><mi>p</mi><mo>=</mo><mn>1</mn></mrow><mi>P</mi></munderover><munderover><mo>∏</mo><mrow><mi>i</mi><mo>=</mo><mn>1</mn></mrow><mi>I</mi></munderover><mi>P</mi><mrow><mo stretchy="true" form="prefix">(</mo><msub><mi>X</mi><mrow><mi>p</mi><mi>i</mi></mrow></msub><mo>∣</mo><msub><mi>θ</mi><mi>p</mi></msub><mo>,</mo><msub><mi>β</mi><mi>i</mi></msub><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">
 L(\theta, \beta) = \prod_{p=1}^P \prod_{i=1}^I P(X_{pi} \mid \theta_p, \beta_i)
 </annotation></semantics></math></p>
 <p>JMLE alternates updates for

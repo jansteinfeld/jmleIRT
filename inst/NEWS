@@ -1,0 +1,26 @@
+********************************************************
+****             NEWS jmleIRT Package               ****
+********************************************************
+
+
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+Joint Maximum Likelihood Estimation of the Rasch Model (jmleIRT)
+J. Steinfeld & A. Robitzsch
+
+mailto:
+-------
+Jan Steinfeld
+jan.d.steinfeld@gmail.com
+
+For reporting a bug, please always provide a reproducible R script 
+and (if necessary) a corresponding dataset.
+
+URL:
+----
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+-------------------------------------------------------------
+VERSIONS jmleIRT 0.3.3-0  |  2025-11-11  |  Last: jmleIRT 0.3.2-1
+-------------------------------------------------------------
+* 

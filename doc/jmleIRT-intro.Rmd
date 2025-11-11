@@ -10,7 +10,8 @@ output:
     highlight: github
     css: style.css
     fig_caption: yes
-    number_sections: TRUE
+    number_sections: true
+
 
 vignette: >
   %\VignetteIndexEntry{jmleIRT: Rasch JML (1PL)}

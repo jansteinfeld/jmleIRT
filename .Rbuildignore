@@ -7,7 +7,6 @@
 ^.*\.rar
 ^.*\.tar
 ^.*\.zip
-^.*\.rmd
 ^Test\.r$
 tests.r
 Paketstruktur.r
@@ -18,3 +17,4 @@ Paketstruktur.r
 ^doc$
 ^Meta$
 ^README\.html$
+^README\.rmd$

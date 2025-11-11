@@ -1,0 +1,27 @@
+if(!exists("meta") || is.null(meta)) meta <- packageDescription("tmt")
+year <- sub(".*(2[[:digit:]]{3})-.*", "\\1", meta$Date, perl = TRUE)
+vers <- paste("R package version", meta$Version)
+if (length(year) == 0) year = format(Sys.Date(), '%Y')
+pkg <- meta$Package
+pkg_title <- "{J}oint Maximum Likelihood Estimation of the Rasch Model"
+
+
+bibentry(bibtype = "Manual",
+        title = paste0( pkg , ": " , pkg_title ) ,
+        author = c(
+          person(given = "Jan", 
+                 family = "Steinfeld"),
+          person(given = "Alexander", 
+                 family = "Robitzsch")),
+        year = year,
+        note = vers, 
+        textVersion =
+         paste0("Steinfeld, J. and Robitzsch, A. (",
+               year,
+               "). " , pkg , ": " , pkg_title , ". ",
+               vers, paste0( "https://CRAN.R-project.org/package=", pkg) ),
+        url =  paste0( "https://CRAN.R-project.org/package=", pkg),
+        header  = "To cite tmt in publications use"
+    )
+    
+

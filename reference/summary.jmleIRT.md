@@ -33,11 +33,3 @@ summary(object, digits = 4, ...)
 Returns the input `object` invisibly.
 
 ## Examples
-
-``` r
-if (FALSE) { # \dontrun{
-X <- matrix(c(1, 0, 1, NA, 0, 1, 1, 1, 1, 1, 0, 0, NA, NA, 0, 1, 0, 0, 0, NA), nrow = 5, byrow = TRUE)
-res <- jmle_estimation(X, max_iter = 200, estimatewle = TRUE, verbose = FALSE)
-summary(res)
-} # }
-```

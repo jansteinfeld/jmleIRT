@@ -3,7 +3,7 @@ pkgdown: 2.2.0
 pkgdown_sha: ~
 articles:
   jmleIRT-intro: jmleIRT-intro.html
-last_built: 2025-11-11T13:47Z
+last_built: 2025-11-13T15:21Z
 urls:
   reference: jansteinfeld.github.io/jmleIRT/reference
   article: jansteinfeld.github.io/jmleIRT/articles

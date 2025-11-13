@@ -68,7 +68,7 @@
                         <h4 data-toc-skip class="author">Jan Steinfeld
 &amp; Alexander Robitzsch</h4>
             
-            <h4 data-toc-skip class="date">November 11, 2025</h4>
+            <h4 data-toc-skip class="date">November 13, 2025</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/jansteinfeld/jmleIRT/blob/main/vignettes/jmleIRT-intro.Rmd" class="external-link"><code>vignettes/jmleIRT-intro.Rmd</code></a></small>
       <div class="d-none name"><code>jmleIRT-intro.Rmd</code></div>
@@ -181,10 +181,10 @@ optimization in C++.</p>
 <span><span class="fu"><a href="https://rdrr.io/r/utils/str.html" class="external-link">str</a></span><span class="op">(</span><span class="va">fit</span><span class="op">)</span></span>
 <span><span class="co">#&gt; List of 8</span></span>
 <span><span class="co">#&gt;  $ data           : num [1:100, 1:10] 0 1 1 0 NA 0 0 0 1 NA ...</span></span>
-<span><span class="co">#&gt;  $ theta          : num [1:100] -0.479 0.35 -0.479 0.35 -1.873 ...</span></span>
-<span><span class="co">#&gt;  $ beta           : num [1:10] 0.472 -0.494 -0.216 -0.269 0.124 ...</span></span>
-<span><span class="co">#&gt;  $ iterations     : int 500</span></span>
-<span><span class="co">#&gt;  $ converged      : logi FALSE</span></span>
+<span><span class="co">#&gt;  $ theta          : num [1:100] -0.415 0.415 -0.415 0.415 -1.81 ...</span></span>
+<span><span class="co">#&gt;  $ beta           : num [1:10] 0.472 -0.495 -0.216 -0.269 0.124 ...</span></span>
+<span><span class="co">#&gt;  $ iterations     : int 5</span></span>
+<span><span class="co">#&gt;  $ converged      : chr "TRUE"</span></span>
 <span><span class="co">#&gt;  $ bias_correction: logi FALSE</span></span>
 <span><span class="co">#&gt;  $ center         : chr "items"</span></span>
 <span><span class="co">#&gt;  $ wle_estimate   : num [1:100] NA NA NA NA NA NA NA NA NA NA ...</span></span>
@@ -216,12 +216,12 @@ optimization in C++.</p>
 <code class="sourceCode R"><span><span class="va">fit_bc</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/jmle_estimation.html">jmle_estimation</a></span><span class="op">(</span><span class="va">X</span>, center <span class="op">=</span> <span class="st">"items"</span>, bias_correction <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">fit_bc</span><span class="op">$</span><span class="va">beta</span><span class="op">)</span></span>
 <span><span class="co">#&gt;      Min.   1st Qu.    Median      Mean   3rd Qu.      Max. </span></span>
-<span><span class="co">#&gt; -0.444768 -0.230188  0.009092  0.000000  0.234406  0.424626</span></span></code></pre></div>
+<span><span class="co">#&gt; -0.445178 -0.230402  0.009101  0.000000  0.234625  0.425021</span></span></code></pre></div>
 <p>Compare to the uncorrected version:</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">fit</span><span class="op">$</span><span class="va">beta</span><span class="op">)</span></span>
-<span><span class="co">#&gt;    Min. 1st Qu.  Median    Mean 3rd Qu.    Max. </span></span>
-<span><span class="co">#&gt; -0.4942 -0.2558  0.0101  0.0000  0.2605  0.4718</span></span></code></pre></div>
+<span><span class="co">#&gt;     Min.  1st Qu.   Median     Mean  3rd Qu.     Max. </span></span>
+<span><span class="co">#&gt; -0.49464 -0.25600  0.01011  0.00000  0.26069  0.47225</span></span></code></pre></div>
 </div>
 <div class="section level3">
 <h3 id="warms-wle-estimates">Warm’s WLE Estimates<a class="anchor" aria-label="anchor" href="#warms-wle-estimates"></a>
@@ -231,7 +231,7 @@ JML estimates.</p>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">fit_wle</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/jmle_estimation.html">jmle_estimation</a></span><span class="op">(</span><span class="va">X</span>, center <span class="op">=</span> <span class="st">"items"</span>, estimatewle <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">fit_wle</span><span class="op">$</span><span class="va">wle_estimate</span><span class="op">)</span></span>
-<span><span class="co">#&gt; [1] -0.3779197  0.3781271 -0.3779197  0.3781271 -1.4876295 -0.3779197</span></span></code></pre></div>
+<span><span class="co">#&gt; [1] -0.3779385  0.3781464 -0.3779385  0.3781464 -1.4876787 -0.3779385</span></span></code></pre></div>
 </div>
 <div class="section level3">
 <h3 id="handling-missing-data">Handling Missing Data<a class="anchor" aria-label="anchor" href="#handling-missing-data"></a>

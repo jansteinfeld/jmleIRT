@@ -82,10 +82,10 @@ fit <- jmle_estimation(
 str(fit)
 #> List of 8
 #>  $ data           : num [1:100, 1:10] 0 1 1 0 NA 0 0 0 1 NA ...
-#>  $ theta          : num [1:100] -0.479 0.35 -0.479 0.35 -1.873 ...
-#>  $ beta           : num [1:10] 0.472 -0.494 -0.216 -0.269 0.124 ...
-#>  $ iterations     : int 500
-#>  $ converged      : logi FALSE
+#>  $ theta          : num [1:100] -0.415 0.415 -0.415 0.415 -1.81 ...
+#>  $ beta           : num [1:10] 0.472 -0.495 -0.216 -0.269 0.124 ...
+#>  $ iterations     : int 5
+#>  $ converged      : chr "TRUE"
 #>  $ bias_correction: logi FALSE
 #>  $ center         : chr "items"
 #>  $ wle_estimate   : num [1:100] NA NA NA NA NA NA NA NA NA NA ...
@@ -110,15 +110,15 @@ Bias correction rescales item difficulty estimates.
 fit_bc <- jmle_estimation(X, center = "items", bias_correction = TRUE)
 summary(fit_bc$beta)
 #>      Min.   1st Qu.    Median      Mean   3rd Qu.      Max. 
-#> -0.444768 -0.230188  0.009092  0.000000  0.234406  0.424626
+#> -0.445178 -0.230402  0.009101  0.000000  0.234625  0.425021
 ```
 
 Compare to the uncorrected version:
 
 ``` r
 summary(fit$beta)
-#>    Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
-#> -0.4942 -0.2558  0.0101  0.0000  0.2605  0.4718
+#>     Min.  1st Qu.   Median     Mean  3rd Qu.     Max. 
+#> -0.49464 -0.25600  0.01011  0.00000  0.26069  0.47225
 ```
 
 ### Warm’s WLE Estimates
@@ -129,7 +129,7 @@ estimates.
 ``` r
 fit_wle <- jmle_estimation(X, center = "items", estimatewle = TRUE)
 head(fit_wle$wle_estimate)
-#> [1] -0.3779197  0.3781271 -0.3779197  0.3781271 -1.4876295 -0.3779197
+#> [1] -0.3779385  0.3781464 -0.3779385  0.3781464 -1.4876787 -0.3779385
 ```
 
 ### Handling Missing Data

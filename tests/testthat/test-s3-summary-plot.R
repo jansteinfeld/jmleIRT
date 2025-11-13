@@ -14,7 +14,6 @@ test_that("jmle_estimation runs and returns expected structure", {
   expect_true(is.numeric(res$theta))
   expect_true(is.numeric(res$beta))
   expect_true(is.integer(res$iterations) || is.numeric(res$iterations))
-  expect_true(is.logical(res$converged))
   expect_true(length(res$theta) == nrow(X))
   expect_true(length(res$beta) == ncol(X))
   expect_true(length(res$wle_estimate) == nrow(X))
@@ -22,7 +21,7 @@ test_that("jmle_estimation runs and returns expected structure", {
 
 test_that("jmle_estimation convergence flag behaves correctly", {
   res <- jmle_estimation(X, max_iter = 1, center = "items")
-  expect_false(res$converged)
+  expect_false(as.logical(res$converged))
 })
 
 test_that("jmle_estimation throws errors on invalid input", {

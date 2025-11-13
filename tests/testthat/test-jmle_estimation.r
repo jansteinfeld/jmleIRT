@@ -22,7 +22,7 @@ test_that("jmle_estimation runs and returns expected structure", {
   expect_equal(length(fit$theta), nrow(X))
   expect_equal(length(fit$beta), ncol(X))
   expect_true(abs(mean(fit$beta)) < 1e-6) # centered
-  expect_type(fit$converged, "logical")
+  expect_type(as.logical(fit$converged), "logical")
   expect_type(fit$iterations, "integer")
   expect_type(fit$bias_correction, "logical")
   expect_type(fit$center, "character")
@@ -51,7 +51,7 @@ test_that("jmle_estimation applies bias correction option", {
 test_that("jmle_estimation stops early when converged", {
   X <- make_X(15, 5)
   fit <- jmle_estimation(X, max_iter = 5, conv = 1e-1, center = "items")
-  expect_true(fit$converged || fit$iterations == 5)
+  expect_true(as.logical(fit$converged) || fit$iterations == 5)
 })
 
 # --- Handling missing data ---

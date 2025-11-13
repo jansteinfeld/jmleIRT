@@ -9,7 +9,7 @@ estimate_wle <- function(X_, beta, max_iter = 100L, tol = 1e-10, lower_ext = NA_
     .Call(`_jmleIRT_estimate_wle`, X_, beta, max_iter, tol, lower_ext, upper_ext, wle_adj)
 }
 
-estimate_jmle <- function(X_, max_iter = 1000L, conv = 1e-6, eps = 0.0, bias_correction = FALSE, center = "items", max_update = 1.5, verbose = FALSE, estimatewle = FALSE, wle_adj = 1e-8) {
+estimate_jmle <- function(X_, max_iter = 1000L, conv = 1e-4, eps = 0.0, bias_correction = FALSE, center = "items", max_update = 10.0, verbose = FALSE, estimatewle = FALSE, wle_adj = 1e-8) {
     .Call(`_jmleIRT_estimate_jmle`, X_, max_iter, conv, eps, bias_correction, center, max_update, verbose, estimatewle, wle_adj)
 }
 

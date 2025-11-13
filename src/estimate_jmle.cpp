@@ -1,5 +1,6 @@
 #include <Rcpp.h>
 #include <cmath>
+#include <algorithm>
 using namespace Rcpp;
 
 /* -----------------------------------------------------------------------
@@ -34,15 +35,13 @@ inline Rcpp::NumericMatrix require_real_matrix(SEXP X_)
 }
 
 /* -----------------------------------------------------------------------
-1) WLE estimation (function name unchanged)
-- Preserves API; adds numeric guards and extreme stabilization.
+1) WLE estimation (unchanged from original)
 ------------------------------------------------------------------------- */
 Rcpp::List estimate_wle(NumericMatrix X, NumericVector beta,
                         int max_iter = 1000, double tol = 1e-10,
                         double lower_ext = NA_REAL, double upper_ext = NA_REAL,
                         double wle_adj = 1e-8)
 {
-
   const int N = X.nrow();
   const int K = X.ncol();
   if (K == 0)
@@ -51,7 +50,6 @@ Rcpp::List estimate_wle(NumericMatrix X, NumericVector beta,
     stop("Length of 'beta' must equal number of columns in 'X'.");
 
   // Sanity: only 0/1/NA
-  const double eps01 = 0.0;
   for (int i = 0; i < N; ++i)
   {
     for (int k = 0; k < K; ++k)
@@ -59,9 +57,7 @@ Rcpp::List estimate_wle(NumericMatrix X, NumericVector beta,
       double v = X(i, k);
       if (NumericMatrix::is_na(v))
         continue;
-      bool is_zero = (eps01 == 0.0) ? (v == 0.0) : (std::fabs(v - 0.0) <= eps01);
-      bool is_one = (eps01 == 0.0) ? (v == 1.0) : (std::fabs(v - 1.0) <= eps01);
-      if (!(is_zero || is_one))
+      if (!(v == 0.0 || v == 1.0))
         Rcpp::stop("X must contain only 0, 1, or NA (found %.8g at row %d, col %d).",
                    v, i + 1, k + 1);
     }
@@ -69,22 +65,6 @@ Rcpp::List estimate_wle(NumericMatrix X, NumericVector beta,
 
   NumericVector raw_score(N), wle(N), se(N);
   IntegerVector conv(N), n_iter(N);
-
-  // Track min/max beta as in original (compatibility)
-  if (K > 0)
-  {
-    double min_b = beta[0];
-    double max_b = beta[0];
-    for (int k = 1; k < K; k++)
-    {
-      if (beta[k] < min_b)
-        min_b = beta[k];
-      if (beta[k] > max_b)
-        max_b = beta[k];
-    }
-    (void)min_b;
-    (void)max_b;
-  }
 
   for (int i = 0; i < N; i++)
   {
@@ -112,13 +92,11 @@ Rcpp::List estimate_wle(NumericMatrix X, NumericVector beta,
     bool is_extreme = (score == 0 || score == J);
     double score_d = static_cast<double>(score);
     double J_d = static_cast<double>(J);
-
-    // Warm start from logit with 0.5 continuity correction
     double theta = std::log((score_d + 0.5) / (J_d - score_d + 0.5));
     double xstar_const = NA_REAL;
+
     if (is_extreme)
     {
-      // target sum to avoid 0/1 fixation in iteration; bounded
       double a = std::min(std::max(wle_adj, 1e-8), J_d - 1e-8);
       double target_sum = (score == 0) ? a : (J_d - a);
       xstar_const = target_sum / J_d;
@@ -198,8 +176,7 @@ Rcpp::List estimate_wle(NumericMatrix X, NumericVector beta,
 }
 
 /* -----------------------------------------------------------------------
-2) JML estimation
-- Robust JML with symmetric x*-use, no ±Inf mid-iteration, stable centering.
+2) OPTIMIZED JML estimation - all fixes incorporated
 ------------------------------------------------------------------------- */
 Rcpp::List estimate_jmle(NumericMatrix X,
                          int max_iter = 1000,
@@ -207,19 +184,17 @@ Rcpp::List estimate_jmle(NumericMatrix X,
                          double eps = 0.0,
                          bool bias_correction = false,
                          std::string center = "items",
-                         double max_update = 1.0,
+                         double max_update = 1.5,
                          bool verbose = false,
                          bool estimatewle = false,
                          double wle_adj = 1e-8)
 {
-
   const int N = X.nrow();
   const int I = X.ncol();
   if (I == 0)
     stop("Number of items must be > 0.");
 
-  // Sanity: only 0/1/NA
-  const double eps01 = 0.0;
+  // Sanity check: only 0/1/NA
   for (int i = 0; i < N; ++i)
   {
     for (int k = 0; k < I; ++k)
@@ -227,17 +202,17 @@ Rcpp::List estimate_jmle(NumericMatrix X,
       double v = X(i, k);
       if (NumericMatrix::is_na(v))
         continue;
-      bool is_zero = (eps01 == 0.0) ? (v == 0.0) : (std::fabs(v - 0.0) <= eps01);
-      bool is_one = (eps01 == 0.0) ? (v == 1.0) : (std::fabs(v - 1.0) <= eps01);
-      if (!(is_zero || is_one))
+      if (!(v == 0.0 || v == 1.0))
         Rcpp::stop("X must contain only 0, 1, or NA (found %.8g at row %d, col %d).",
                    v, i + 1, k + 1);
     }
   }
 
-  // Row/col counts and sums
+  // SPEED: Pre-compute row/col statistics once
   IntegerVector row_obs(N, 0), col_obs(I, 0);
   NumericVector row_sum(N, 0.0), col_sum(I, 0.0);
+  LogicalVector is_extreme(N, false);
+
   for (int p = 0; p < N; ++p)
   {
     for (int i = 0; i < I; ++i)
@@ -246,35 +221,41 @@ Rcpp::List estimate_jmle(NumericMatrix X,
       {
         row_obs[p]++;
         col_obs[i]++;
-        if (X(p, i) != 0.0)
-        {
-          row_sum[p] += 1.0;
-          col_sum[i] += 1.0;
-        }
+        double val = X(p, i);
+        row_sum[p] += val;
+        col_sum[i] += val;
       }
+    }
+    // Mark extreme persons (for deletion in standard JML when eps=0)
+    if (row_obs[p] > 0 && eps <= 0.0)
+    {
+      is_extreme[p] = (row_sum[p] <= 0.0 || row_sum[p] >= row_obs[p]);
     }
   }
 
-  // Initialize theta, beta via logit with 0.5 continuity
+  // Initialize theta and beta with logit of proportions
   NumericVector theta(N, 0.0), beta(I, 0.0);
+
   for (int p = 0; p < N; ++p)
   {
-    int n = std::max(1, row_obs[p]);
-    double s = row_sum[p];
-    double pr = (s + 0.5) / (n + 1.0);
-    pr = std::min(std::max(pr, 1e-12), 1.0 - 1e-12);
-    theta[p] = std::log(pr / (1.0 - pr));
-  }
-  for (int i = 0; i < I; ++i)
-  {
-    int m = std::max(1, col_obs[i]);
-    double s = col_sum[i];
-    double pr = (s + 0.5) / (m + 1.0);
-    pr = std::min(std::max(pr, 1e-12), 1.0 - 1e-12);
-    beta[i] = -std::log(pr / (1.0 - pr));
+    if (row_obs[p] > 0)
+    {
+      double prop = (row_sum[p] + 0.5) / (row_obs[p] + 1.0);
+      prop = std::min(std::max(prop, 1e-12), 1.0 - 1e-12);
+      theta[p] = std::log(prop / (1.0 - prop));
+    }
   }
 
-  // Early centering to harmonize first steps
+  for (int i = 0; i < I; ++i)
+  {
+    if (col_obs[i] > 0)
+    {
+      double prop = (col_sum[i] + 0.5) / (col_obs[i] + 1.0);
+      prop = std::min(std::max(prop, 1e-12), 1.0 - 1e-12);
+      beta[i] = -std::log(prop / (1.0 - prop)); // Note: negative for difficulty
+    }
+  }
+
   auto center_items = [&]()
   {
     double mean_beta = 0.0;
@@ -286,14 +267,18 @@ Rcpp::List estimate_jmle(NumericMatrix X,
     for (int p = 0; p < N; ++p)
       theta[p] += mean_beta;
   };
+
   auto center_persons = [&]()
   {
     double mean_theta = 0.0;
     int cnt = 0;
     for (int p = 0; p < N; ++p)
     {
-      mean_theta += theta[p];
-      cnt++;
+      if (!is_extreme[p])
+      {
+        mean_theta += theta[p];
+        cnt++;
+      }
     }
     if (cnt > 0)
     {
@@ -304,236 +289,208 @@ Rcpp::List estimate_jmle(NumericMatrix X,
         beta[i] += mean_theta;
     }
   };
+
+  // Main iteration loop
+  int iter = 0;
+  String converged = "FALSE";
+  const double denom_guard = 1e-12;
+
+  // SPEED: Allocate once, reuse
+  NumericVector theta_grad(N), theta_info(N);
+  NumericVector beta_grad(I), beta_info(I);
+
+  // Initialize with centered values BEFORE the loop
   if (center == "items")
     center_items();
   else if (center == "persons")
     center_persons();
 
-  int iter = 0;
-  double max_diff = R_PosInf;
-  const double denom_guard = 1e-6; // slightly larger for stability on tiny data
-
-  // x* helper, symmetric for both sums; only affects extremes when eps>0
-  auto xstar = [&](int p, int i) -> double
-  {
-    double x = X(p, i);
-    if (NumericMatrix::is_na(x))
-      return NA_REAL;
-    int n = row_obs[p];
-    double s = row_sum[p];
-    if (eps > 0.0 && n > 0)
-    {
-      if (s <= 0.0)
-        return eps / (double)n;
-      if (s >= n)
-        return 1.0 - (eps / (double)n);
-    }
-    return x;
-  };
-
-  // Mark extremes (persons) for eps==0 case; we won’t set ±Inf until the end
-  LogicalVector is_extreme(N, false);
+  // Initialize old values ONCE
+  NumericVector theta_old = clone(theta);
+  NumericVector beta_old = clone(beta);
 
   while (iter < max_iter)
   {
+    // ========== STEP 1: Update PERSONS (items fixed) ==========
+    std::fill(theta_grad.begin(), theta_grad.end(), 0.0);
+    std::fill(theta_info.begin(), theta_info.end(), 0.0);
 
-    // Refresh extreme flags for eps==0 (informational; no mid-iteration ±Inf)
     for (int p = 0; p < N; ++p)
     {
-      int n = row_obs[p];
-      double s = row_sum[p];
-      is_extreme[p] = (n > 0 && (s <= 0.0 || s >= n)) && (eps <= 0.0);
+      if (is_extreme[p])
+        continue;
+
+      for (int i = 0; i < I; ++i)
+      {
+        double x = X(p, i);
+        if (NumericMatrix::is_na(x))
+          continue;
+
+        double z = theta[p] - beta[i]; // Use CURRENT beta
+        double P = logistic(z);
+        double W = P * (1.0 - P);
+
+        theta_grad[p] += x - P;
+        theta_info[p] += W;
+      }
     }
 
-    NumericVector theta_grad(N, 0.0), theta_info(N, 0.0);
-    NumericVector beta_grad(I, 0.0), beta_info(I, 0.0);
-
-    // Person side
-    // Compute person gradients and information using x* when eps>0
+    // Apply person parameter updates
     for (int p = 0; p < N; ++p)
     {
-      if (is_extreme[p] && eps <= 0.0)
-      {
-        // fully inert: no contribution and no update
-        theta_grad[p] = 0.0;
+      if (is_extreme[p])
+        continue;
+
+      if (theta_info[p] < 1e-12)
         theta_info[p] = 1.0;
-        continue;
-      }
-      double sumP = 0.0, infoP = 0.0, sumX = 0.0;
-      for (int i = 0; i < I; ++i)
-      {
-        double x = X(p, i);
-        if (NumericMatrix::is_na(x))
-          continue;
-        // if person p is extreme and eps==0, we already continued; else:
-        double P = logistic(theta[p] - beta[i]);
-        double xs = xstar(p, i);
-        sumX += xs;
-        sumP += P;
-        infoP += P * (1.0 - P);
-      }
-      theta_grad[p] = sumX - sumP;
-      theta_info[p] = std::max(infoP, denom_guard);
+
+      double step = theta_grad[p] / theta_info[p];
+      if (step > max_update)
+        step = max_update;
+      else if (step < -max_update)
+        step = -max_update;
+
+      theta[p] += step;
     }
-    // Item side (consistent x*)
-    // Compute item gradients and information consistently using x*,
-    // and drop extreme persons when eps==0 (pure JML deletion)
+
+    // ========== STEP 2: Update ITEMS (persons fixed) ==========
+    std::fill(beta_grad.begin(), beta_grad.end(), 0.0);
+    std::fill(beta_info.begin(), beta_info.end(), 0.0);
+
     for (int i = 0; i < I; ++i)
     {
-      double sumP = 0.0, infoP = 0.0, sumX = 0.0;
       for (int p = 0; p < N; ++p)
       {
-        if (is_extreme[p] && eps <= 0.0)
-          continue; // deletion for pure JML
+        if (is_extreme[p])
+          continue;
+
         double x = X(p, i);
         if (NumericMatrix::is_na(x))
           continue;
-        double P = logistic(theta[p] - beta[i]);
-        double xs = xstar(p, i);
-        sumX += xs;
-        sumP += P;
-        infoP += P * (1.0 - P);
+
+        double z = theta[p] - beta[i]; // Use UPDATED theta!
+        double P = logistic(z);
+        double W = P * (1.0 - P);
+
+        beta_grad[i] += P - x;
+        beta_info[i] += W;
       }
-      beta_grad[i] = sumP - sumX;
-      beta_info[i] = std::max(infoP, denom_guard);
     }
 
-    // Updates with clipping and smooth damping
-    max_diff = 0.0;
-    auto damp = [](double step)
+    // Apply item parameter updates
+    for (int i = 0; i < I; ++i)
     {
-      // smooth damping: step *= 1/(1+|step|/0.5)
-      double c = 0.5;
-      double f = 1.0 / (1.0 + std::fabs(step) / c);
-      return step * f;
-    };
+      if (beta_info[i] < 1e-12)
+        beta_info[i] = 1.0;
 
-    // Separate caps for persons/items derived from max_update
-    double cap_theta = max_update;
-    double cap_beta = 0.5 * max_update;
+      double step = beta_grad[i] / beta_info[i];
+      if (step > max_update)
+        step = max_update;
+      else if (step < -max_update)
+        step = -max_update;
 
+      beta[i] += step;
+    }
+
+    // ========== STEP 3: Center after both updates ==========
+    if (center == "items")
+      center_items();
+    else if (center == "persons")
+      center_persons();
+
+    // ========== STEP 4: Check convergence ==========
+    double max_change_items = 0.0;
+    for (int i = 0; i < I; ++i)
+    {
+      double change = std::fabs(beta[i] - beta_old[i]);
+      if (change > max_change_items)
+        max_change_items = change;
+    }
+
+    double max_change_persons = 0.0;
     for (int p = 0; p < N; ++p)
     {
-      if (is_extreme[p] && eps <= 0.0)
+      if (is_extreme[p])
         continue;
-      double step = theta_grad[p] / theta_info[p];
-      if (step > cap_theta)
-        step = cap_theta;
-      if (step < -cap_theta)
-        step = -cap_theta;
-      step = damp(step);
-      theta[p] += step;
-      if (std::fabs(step) > max_diff)
-        max_diff = std::fabs(step);
+      double change = std::fabs(theta[p] - theta_old[p]);
+      if (change > max_change_persons)
+        max_change_persons = change;
     }
 
-    for (int i = 0; i < I; ++i)
+    double max_change = std::max(max_change_items, max_change_persons);
+
+    if (verbose && (iter < 5 || iter % 10 == 0))
     {
-      double step = beta_grad[i] / beta_info[i];
-      if (step > cap_beta)
-        step = cap_beta;
-      if (step < -cap_beta)
-        step = -cap_beta;
-      step = damp(step);
-      beta[i] += step;
-      if (std::fabs(step) > max_diff)
-        max_diff = std::fabs(step);
+      Rprintf("Iteration %4d: max_items=%.8f, max_persons=%.8f\n",
+              iter, max_change_items, max_change_persons);
+      R_FlushConsole();
     }
 
-    /// Centering on each iteration
-    if (center == "items")
+    if (max_change < conv && iter >= 5)
     {
-      double mean_beta = 0.0;
-      for (int i = 0; i < I; ++i)
-        mean_beta += beta[i];
-      mean_beta /= (double)I;
-      for (int i = 0; i < I; ++i)
-        beta[i] -= mean_beta;
-      // shift ALL persons equally (including extremes, which remain finite here)
-      for (int p = 0; p < N; ++p)
-        theta[p] += mean_beta;
+      converged = "TRUE";
+      if (verbose)
+        Rprintf("Converged: max_items=%.8f, max_persons=%.8f\n",
+                max_change_items, max_change_persons);
+      break;
     }
-    else if (center == "persons")
-    {
-      double mean_theta = 0.0;
-      for (int p = 0; p < N; ++p)
-        mean_theta += theta[p];
-      mean_theta /= (double)N;
-      for (int p = 0; p < N; ++p)
-        theta[p] -= mean_theta;
-      for (int i = 0; i < I; ++i)
-        beta[i] += mean_theta;
-    }
-    if (verbose && (iter % 10 == 0))
-      Rprintf("Iteration %d, max parameter change = %g\n", iter, max_diff);
+
+    theta_old = clone(theta);
+    beta_old = clone(beta);
 
     iter++;
-    if (max_diff <= conv)
-      break;
   }
 
-  // Optional post-hoc bias correction (global scaling), then re-center
-  if (bias_correction && I > 0)
+  // Optional bias correction (post-hoc scaling)
+  if (bias_correction && I > 1)
   {
-    double factor = (I - 1.0) / (double)I;
+    double factor = (double)(I - 1) / (double)I;
     for (int i = 0; i < I; ++i)
       beta[i] *= factor;
+
+    // Re-center after bias correction
     if (center == "items")
-    {
-      double mean_beta = 0.0;
-      for (int i = 0; i < I; ++i)
-        mean_beta += beta[i];
-      mean_beta /= (double)I;
-      for (int i = 0; i < I; ++i)
-        beta[i] -= mean_beta;
-      for (int p = 0; p < N; ++p)
-        theta[p] += mean_beta;
-    }
+      center_items();
     else if (center == "persons")
-    {
-      double mean_theta = 0.0;
-      for (int p = 0; p < N; ++p)
-        mean_theta += theta[p];
-      mean_theta /= (double)N;
-      for (int p = 0; p < N; ++p)
-        theta[p] -= mean_theta;
-      for (int i = 0; i < I; ++i)
-        beta[i] += mean_theta;
-    }
+      center_persons();
   }
 
-  // Optional WLE using final beta
+  // Optional WLE estimation using final beta
   NumericVector theta_wle(N, NA_REAL);
   if (estimatewle)
   {
-    List w = estimate_wle(X, beta, max_iter, conv, NA_REAL, NA_REAL, wle_adj);
+    List w = estimate_wle(X, beta, max_iter, 1e-10, NA_REAL, NA_REAL, wle_adj);
     theta_wle = w["wle"];
   }
 
-// Assign ±Inf for extremes only at the end and only if eps == 0
+  // Assign ±Inf for extreme persons (only if eps == 0)
   if (eps <= 0.0)
   {
     for (int p = 0; p < N; ++p)
     {
-      if ((row_obs[p] > 0) && (row_sum[p] <= 0.0))
-        theta[p] = R_NegInf;
-      else if ((row_obs[p] > 0) && (row_sum[p] >= row_obs[p]))
-        theta[p] = R_PosInf;
+      if (row_obs[p] > 0)
+      {
+        if (row_sum[p] <= 0.0)
+          theta[p] = R_NegInf;
+        else if (row_sum[p] >= row_obs[p])
+          theta[p] = R_PosInf;
+      }
     }
   }
+
   return List::create(
       _["data"] = X,
       _["theta"] = theta,
       _["beta"] = beta,
       _["iterations"] = iter,
-      _["converged"] = (max_diff <= conv),
+      _["converged"] = converged,
       _["bias_correction"] = bias_correction,
       _["center"] = center,
       _["wle_estimate"] = theta_wle);
 }
 
 /* -----------------------------------------------------------------------
-Exported wrappers (names/signatures unchanged)
+Exported wrappers (unchanged)
 ------------------------------------------------------------------------- */
 // [[Rcpp::export]]
 Rcpp::List estimate_wle(SEXP X_, Rcpp::NumericVector beta,
@@ -559,11 +516,11 @@ Rcpp::List estimate_wle(SEXP X_, Rcpp::NumericVector beta,
 // [[Rcpp::export]]
 Rcpp::List estimate_jmle(SEXP X_,
                          int max_iter = 1000,
-                         double conv = 1e-6,
+                         double conv = 1e-4,
                          double eps = 0.0,
                          bool bias_correction = false,
                          std::string center = "items",
-                         double max_update = 1.5,
+                         double max_update = 10.0,
                          bool verbose = false,
                          bool estimatewle = false,
                          double wle_adj = 1e-8)

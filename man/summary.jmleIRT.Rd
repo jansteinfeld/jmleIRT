@@ -7,8 +7,10 @@
 \method{summary}{jmleIRT}(object, digits = 4, ...)
 }
 \arguments{
-\item{object}{An object of class \code{"jmleIRT"} containing numeric vectors \code{theta} and \code{beta}.
-If not a strict fit object, it must still provide \code{theta} and \code{beta} accessible as \code{object$theta} and \code{object$beta}.}
+\item{object}{An object of class \code{"jmleIRT"} containing numeric vectors 
+  \code{theta} and \code{beta}.
+If not a strict fit object, it must still provide \code{theta} and 
+  \code{beta} accessible as \code{object$theta} and \code{object$beta}.}
 
 \item{digits}{Number of digits for numeric rounding (default 4).}
 
@@ -23,7 +25,16 @@ including number of iterations, item difficulties, and person ability parameters
 }
 \examples{
 \dontrun{
-X <- matrix(c(1, 0, 1, NA, 0, 1, 1, 1, 1, 1, 0, 0, NA, NA, 0, 1, 0, 0, 0, NA), nrow = 5, byrow = TRUE)
+\examples{
+X <- matrix(
+  c(1, 0, 1, NA, 0,
+    1, 1, 1, 1, 0,
+    0, NA, NA, 0, 1,
+    0, 0, 0, NA),
+  nrow = 5,
+  byrow = TRUE
+)
+}
 res <- jmle_estimation(X, max_iter = 200, estimatewle = TRUE, verbose = FALSE)
 summary(res)
 }

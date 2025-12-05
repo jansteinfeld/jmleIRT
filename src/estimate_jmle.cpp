@@ -92,17 +92,17 @@ Rcpp::List estimate_wle(NumericMatrix X, NumericVector beta,
 
     // initial theta estimate
     bool is_extreme = (score == 0 || score == J);
-    double score_d = static_cast<double>(score);                      // observed score
-    double J_d = static_cast<double>(J);                              // number of valid items
+    double score_d = static_cast<double>(score); // observed score
+    double J_d = static_cast<double>(J); // number of valid items
     double theta = std::log((score_d + 0.5) / (J_d - score_d + 0.5)); // initial theta
-    double xstar_const = NA_REAL;                                     // for extreme scores
+    double xstar_const = NA_REAL; // for extreme scores
 
     // handle extreme scores
-    if (is_extreme)
+    if (is_extreme) 
     {
       double a = std::min(std::max(wle_adj, 1e-8), J_d - 1e-8); // guard for extremes
-      double target_sum = (score == 0) ? a : (J_d - a);         // adjusted target sum
-      xstar_const = target_sum / J_d;                           // effective score for all items
+      double target_sum = (score == 0) ? a : (J_d - a); // adjusted target sum
+      xstar_const = target_sum / J_d; // effective score for all items
     }
 
     int converged = 0;
@@ -121,13 +121,13 @@ Rcpp::List estimate_wle(NumericMatrix X, NumericVector beta,
         double x = X(i, k);
         if (NumericMatrix::is_na(x))
           continue;
-        double z = theta - beta[k];                 // theta - b_k
-        double p = logistic(z);                     // P(X=1|theta)
-        double var = p * (1.0 - p);                 // Variance
+        double z = theta - beta[k]; // theta - b_k
+        double p = logistic(z); // P(X=1|theta)
+        double var = p * (1.0 - p); // Variance
         double xeff = is_extreme ? xstar_const : x; // effective score
-        fi += (xeff - p);                           // Score function
-        dfi += var;                                 // Fisher information
-        wle_bias_sum += var * (1.0 - 2.0 * p);      // correction term for WLE
+        fi += (xeff - p); // Score function
+        dfi += var; // Fisher information
+        wle_bias_sum += var * (1.0 - 2.0 * p); // correction term for WLE
       }
 
       // Check for zero information
@@ -136,15 +136,15 @@ Rcpp::List estimate_wle(NumericMatrix X, NumericVector beta,
 
       // WLE bias correction
       double bias = 0.5 * wle_bias_sum / (-dfi); // bias term
-      double fi_wle = fi - bias;                 // adjusted score function
-      delta = fi_wle / (-dfi);                   // Newton-Raphson update
-      if (!R_finite(delta))                      // guard against numerical issues
+      double fi_wle = fi - bias; // adjusted score function
+      delta = fi_wle / (-dfi); // Newton-Raphson update
+      if (!R_finite(delta)) // guard against numerical issues
         break;
-      if (std::abs(delta) > 5.0)          // limit step size
+      if (std::abs(delta) > 5.0) // limit step size
         delta = (delta > 0 ? 5.0 : -5.0); // limit step size
 
       double theta_new = theta - delta; // update theta
-
+      
       // Check convergence
       if (std::abs(delta) < tol)
       {
@@ -164,24 +164,25 @@ Rcpp::List estimate_wle(NumericMatrix X, NumericVector beta,
         if (NumericMatrix::is_na(x))
           continue;
         double z = theta - beta[k]; // theta - b_k
-        double p = logistic(z);     // P(X=1|theta)
-        I_final += p * (1.0 - p);   // Fisher information
+        double p = logistic(z); // P(X=1|theta)
+        I_final += p * (1.0 - p); // Fisher information
       }
     }
 
     wle[i] = theta;
-    se[i] = converged ? std::sqrt(1.0 / std::max(I_final, 1e-12)) : NA_REAL;
+    se[i] = converged ? std::sqrt(1.0 / std::max(I_final, 1e-12)) : NA_REAL; // standard error calculation
     conv[i] = converged;
     n_iter[i] = converged ? (iter + 1) : max_iter;
   }
   // Return results
   return List::create(
-      Named("raw_score") = raw_score,
-      Named("wle") = wle,
-      Named("standard_error") = se,
-      Named("conv") = conv,
-      Named("iterations") = n_iter);
+      Named("raw_score") = raw_score, // observed raw scores
+      Named("wle") = wle, // WLE estimates
+      Named("standard_error") = se, // standard errors
+      Named("conv") = conv, // convergence indicators
+      Named("iterations") = n_iter); // number of iterations
 }
+
 
 /* -----------------------------------------------------------------------
 2) OPTIMIZED JML estimation - all fixes incorporated
@@ -212,7 +213,7 @@ Rcpp::List estimate_jmle(NumericMatrix X,
         continue;
       if (!(v == 0.0 || v == 1.0))
         Rcpp::stop("X must contain only 0, 1, or NA (found %.8g at row %d, col %d).",
-                   v, i + 1, k + 1);
+                   v, i + 1, k + 1); 
     }
   }
 
@@ -230,7 +231,7 @@ Rcpp::List estimate_jmle(NumericMatrix X,
       {
         row_obs[p]++;
         col_obs[i]++;
-        double val = X(p, i);
+        double val = X(p, i); // 0 or 1
         row_sum[p] += val;
         col_sum[i] += val;
       }
@@ -245,39 +246,42 @@ Rcpp::List estimate_jmle(NumericMatrix X,
 
   // Initialize theta and beta with logit of proportions
   NumericVector theta(N, 0.0), beta(I, 0.0);
-
+  
   // Initial person parameters
   for (int p = 0; p < N; ++p)
   {
     if (row_obs[p] > 0)
     {
-      double prop = (row_sum[p] + 0.5) / (row_obs[p] + 1.0);
-      prop = std::min(std::max(prop, 1e-12), 1.0 - 1e-12);
-      theta[p] = std::log(prop / (1.0 - prop));
+      double prop = (row_sum[p] + 0.5) / (row_obs[p] + 1.0); // Laplace smoothing
+      prop = std::min(std::max(prop, 1e-12), 1.0 - 1e-12); // avoid extremes
+      theta[p] = std::log(prop / (1.0 - prop)); // logit transform
     }
   }
+
   // Initial item parameters
   for (int i = 0; i < I; ++i)
   {
     if (col_obs[i] > 0)
     {
-      double prop = (col_sum[i] + 0.5) / (col_obs[i] + 1.0);
-      prop = std::min(std::max(prop, 1e-12), 1.0 - 1e-12);
+      double prop = (col_sum[i] + 0.5) / (col_obs[i] + 1.0); // Laplace smoothing
+      prop = std::min(std::max(prop, 1e-12), 1.0 - 1e-12); // avoid extremes
       beta[i] = -std::log(prop / (1.0 - prop)); // Note: negative for difficulty
     }
   }
+  
   // Centering functions if items are required
   auto center_items = [&]()
   {
     double mean_beta = 0.0;
     for (int i = 0; i < I; ++i)
-      mean_beta += beta[i];
-    mean_beta /= (double)I;
+      mean_beta += beta[i]; // sum of item difficulties
+    mean_beta /= (double)I; // mean difficulty
     for (int i = 0; i < I; ++i)
-      beta[i] -= mean_beta;
+      beta[i] -= mean_beta; // center difficulties
     for (int p = 0; p < N; ++p)
-      theta[p] += mean_beta;
+      theta[p] += mean_beta; // adjust abilities accordingly
   };
+
   // Centering functions if persons are required
   auto center_persons = [&]()
   {
@@ -287,17 +291,17 @@ Rcpp::List estimate_jmle(NumericMatrix X,
     {
       if (!is_extreme[p])
       {
-        mean_theta += theta[p];
+        mean_theta += theta[p]; // sum of person abilities
         cnt++;
       }
     }
     if (cnt > 0)
     {
-      mean_theta /= (double)cnt;
+      mean_theta /= (double)cnt; // mean ability
       for (int p = 0; p < N; ++p)
-        theta[p] -= mean_theta;
+        theta[p] -= mean_theta; // center abilities
       for (int i = 0; i < I; ++i)
-        beta[i] += mean_theta;
+        beta[i] += mean_theta; // adjust difficulties accordingly
     }
   };
 
@@ -326,7 +330,7 @@ Rcpp::List estimate_jmle(NumericMatrix X,
     // ========== STEP 1: Update PERSONS (items fixed) ==========
     std::fill(theta_grad.begin(), theta_grad.end(), 0.0);
     std::fill(theta_info.begin(), theta_info.end(), 0.0);
-
+    
     // Compute gradients and information for persons
     for (int p = 0; p < N; ++p)
     {
@@ -340,11 +344,11 @@ Rcpp::List estimate_jmle(NumericMatrix X,
           continue;
 
         double z = theta[p] - beta[i]; // theta - b_i
-        double P = logistic(z);        // P(X=1|theta,beta)
-        double W = P * (1.0 - P);      // Variance
+        double P = logistic(z); // P(X=1|theta,beta)
+        double W = P * (1.0 - P); // Variance
 
         theta_grad[p] += x - P; // Score function
-        theta_info[p] += W;     // Fisher information
+        theta_info[p] += W; // Fisher information
       }
     }
 
@@ -370,7 +374,7 @@ Rcpp::List estimate_jmle(NumericMatrix X,
     // ========== STEP 2: Update ITEMS (persons fixed) ==========
     std::fill(beta_grad.begin(), beta_grad.end(), 0.0);
     std::fill(beta_info.begin(), beta_info.end(), 0.0);
-
+    
     // Compute gradients and information for items
     for (int i = 0; i < I; ++i)
     {
@@ -379,17 +383,17 @@ Rcpp::List estimate_jmle(NumericMatrix X,
         // Skip extreme persons
         if (is_extreme[p])
           continue;
-
+        
         double x = X(p, i);
         if (NumericMatrix::is_na(x))
           continue;
 
         double z = theta[p] - beta[i]; // theta - b_i
-        double P = logistic(z);        // P(X=1|theta,beta)
-        double W = P * (1.0 - P);      // Variance
+        double P = logistic(z); // P(X=1|theta,beta)
+        double W = P * (1.0 - P); // Variance
 
         beta_grad[i] += P - x; // Score function
-        beta_info[i] += W;     // Fisher information
+        beta_info[i] += W; // Fisher information
       }
     }
 

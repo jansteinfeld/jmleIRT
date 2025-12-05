@@ -49,7 +49,7 @@ inline double logistic(double x)
 
 // [[Rcpp::export]]
 Rcpp::List biasCorrectionJMLE(NumericVector &theta, NumericVector &beta, const NumericMatrix &X,
-                              int N, int I)
+                                int N, int I)
 {
 
   NumericVector biasTheta(N);

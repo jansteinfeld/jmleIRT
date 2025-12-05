@@ -5,7 +5,7 @@ test_that("Bias-Korrektur verändert Schätzer wie erwartet", {
   I <- ncol(X)
   N <- nrow(X)
 
-  result <- biasCorrectionJMLE(theta, beta, X, N, I)
+  result <- jmleIRT:::biasCorrectionJMLE(theta, beta, X, N, I)
 
   expect_type(result, "list")
   expect_named(result, c("theta", "beta"))

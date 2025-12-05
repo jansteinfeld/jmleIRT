@@ -1,0 +1,114 @@
+
+R version 4.5.2 (2025-10-31) -- "[Not] Part in a Rumble"
+Copyright (C) 2025 The R Foundation for Statistical Computing
+Platform: aarch64-apple-darwin20
+
+R is free software and comes with ABSOLUTELY NO WARRANTY.
+You are welcome to redistribute it under certain conditions.
+Type 'license()' or 'licence()' for distribution details.
+
+  Natural language support but running in an English locale
+
+R is a collaborative project with many contributors.
+Type 'contributors()' for more information and
+'citation()' on how to cite R or R packages in publications.
+
+Type 'demo()' for some demos, 'help()' for on-line help, or
+'help.start()' for an HTML browser interface to help.
+Type 'q()' to quit R.
+
+> pkgname <- "jmleIRT"
+> source(file.path(R.home("share"), "R", "examples-header.R"))
+> options(warn = 1)
+> base::assign(".ExTimings", "jmleIRT-Ex.timings", pos = 'CheckExEnv')
+> base::cat("name\tuser\tsystem\telapsed\n", file=base::get(".ExTimings", pos = 'CheckExEnv'))
+> base::assign(".format_ptime",
++ function(x) {
++   if(!is.na(x[4L])) x[1L] <- x[1L] + x[4L]
++   if(!is.na(x[5L])) x[2L] <- x[2L] + x[5L]
++   options(OutDec = '.')
++   format(x[1L:3L], digits = 7L)
++ },
++ pos = 'CheckExEnv')
+> 
+> ### * </HEADER>
+> library('jmleIRT')
+
+  |--------------------------------------------------------------|
+  |  jmleIRT 0.0.2.5                                             |
+  |  R  4.5.2 | type ?jmleIRT for help | citation(' jmleIRT ')   |
+  |                                                              |
+  |  Rasch (1PL) JML with optional Warm's WLE and NA handling.   |
+  |  Fast C++ core, centering and epsilon adjustment.            |
+  |--------------------------------------------------------------|
+
+> 
+> base::assign(".oldSearch", base::search(), pos = 'CheckExEnv')
+> base::assign(".old_wd", base::getwd(), pos = 'CheckExEnv')
+> cleanEx()
+> nameEx("biasCorrection")
+> ### * biasCorrection
+> 
+> flush(stderr()); flush(stdout())
+> 
+> base::assign(".ptime", proc.time(), pos = "CheckExEnv")
+> ### Name: biasCorrection
+> ### Title: Analytical First-Order Bias Correction for Joint Maximum
+> ###   Likelihood Estimators in the Rasch Model
+> ### Aliases: biasCorrection
+> 
+> ### ** Examples
+> 
+> ## Not run: 
+> ##D # Example data matrix with 2 persons and 4 items:
+> ##D X <- matrix(c(1, 0, 1, NA, 1, 0, 1, 1), nrow = 2, byrow = TRUE)
+> ##D theta <- c(0.5, -0.5)
+> ##D beta <- c(-0.2, 0.1, 0.3, -0.1)
+> ##D I <- ncol(X)
+> ##D corrected <- biasCorrectionJMLE(theta, beta, X, I)
+> ##D print(corrected$theta)
+> ##D print(corrected$beta)
+> ## End(Not run)
+> 
+> 
+> 
+> base::assign(".dptime", (proc.time() - get(".ptime", pos = "CheckExEnv")), pos = "CheckExEnv")
+> base::cat("biasCorrection", base::get(".format_ptime", pos = 'CheckExEnv')(get(".dptime", pos = "CheckExEnv")), "\n", file=base::get(".ExTimings", pos = 'CheckExEnv'), append=TRUE, sep="\t")
+> cleanEx()
+> nameEx("prox_algorithm")
+> ### * prox_algorithm
+> 
+> flush(stderr()); flush(stdout())
+> 
+> base::assign(".ptime", proc.time(), pos = "CheckExEnv")
+> ### Name: prox_algorithm
+> ### Title: PROX Estimation for the Rasch Model
+> ### Aliases: prox_algorithm
+> 
+> ### ** Examples
+> 
+> ## Not run: 
+> ##D data <- matrix(sample(0:1, 100, replace = TRUE), nrow = 10, ncol = 10)
+> ##D result <- prox_algorithm(data)
+> ##D print(result$b)
+> ## End(Not run)
+> 
+> 
+> 
+> base::assign(".dptime", (proc.time() - get(".ptime", pos = "CheckExEnv")), pos = "CheckExEnv")
+> base::cat("prox_algorithm", base::get(".format_ptime", pos = 'CheckExEnv')(get(".dptime", pos = "CheckExEnv")), "\n", file=base::get(".ExTimings", pos = 'CheckExEnv'), append=TRUE, sep="\t")
+> ### * <FOOTER>
+> ###
+> cleanEx()
+> options(digits = 7L)
+> base::cat("Time elapsed: ", proc.time() - base::get("ptime", pos = 'CheckExEnv'),"\n")
+Time elapsed:  0.116 0.006 0.124 0 0 
+> grDevices::dev.off()
+null device 
+          1 
+> ###
+> ### Local variables: ***
+> ### mode: outline-minor ***
+> ### outline-regexp: "\\(> \\)?### [*]+" ***
+> ### End: ***
+> quit('no')

@@ -1,0 +1,156 @@
+---
+title: "First steps with the Package jmleIRT"
+author: "Jan Steinfeld & Alexander Robitzsch"
+date: "`r format(Sys.time(), '%B %d, %Y')`"
+
+output:
+  prettydoc::html_pretty:
+    smart: false
+    theme: cayman
+    highlight: github
+    css: style.css
+    fig_caption: yes
+    number_sections: TRUE
+
+vignette: >
+  %\VignetteIndexEntry{jmleIRT: Rasch JML (1PL)}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+
+bibliography: references.bib
+csl: apa.csl
+---
+
+```{r setup, echo=FALSE, message=FALSE, warning=FALSE}
+  knitr::opts_chunk$set(
+    collapse = TRUE,
+    comment = "#>",
+    fig.width = 10, 
+    fig.height = 10
+  )
+  options(width=80)
+
+  # includes: in_header: "header.html"
+  library(jmleIRT)
+```
+
+
+# Introduction
+
+The `jmleIRT` package provides an implementation of Joint Maximum Likelihood Estimation (JMLE) for the Rasch (1PL) model. It allows estimation of item difficulties and person abilities from dichotomous response data with bias correction and weighted likelihood estimation options.
+
+# Rasch Model Specification
+
+For person \( p = 1, \ldots, P \) and item \( i = 1, \ldots, I \), the Rasch model posits the probability of a correct response \(X_{pi}\) as:
+
+\[
+P(X_{pi} = 1 \mid \theta_p, \beta_i) = \frac{\exp(\theta_p - \beta_i)}{1 + \exp(\theta_p - \beta_i)}
+\]
+
+where \(\theta_p\) represents the ability of person \( p \) and \(\beta_i\) the difficulty of item \( i \).
+
+# Joint Maximum Likelihood Estimation
+
+The joint likelihood across all persons and items is
+
+\[
+L(\theta, \beta) = \prod_{p=1}^P \prod_{i=1}^I P(X_{pi} \mid \theta_p, \beta_i)
+\]
+
+JMLE alternates updates for \(\theta_p\) and \(\beta_i\) until convergence, providing simultaneous estimates of person and item parameters.
+
+# Bias Correction
+
+Finite samples and extreme scores induce bias in JMLE estimates. The package implements:
+
+- **Epsilon bias stabilization:** Adding a small \(\varepsilon > 0\) to avoid infinite logits and improve numerical stability.
+- **Analytical bias correction:** Drawing on methods from psychometric literature to reduce bias in item difficulty estimates.
+
+# Using the jmleIRT Package
+
+Key features:
+- Missing values by design are allowed (`NA`).
+- Optional epsilon adjustment (`eps`) to reduce estimation bias from extreme scores.
+- Centering based on either "items" or "persons" to ensure identifiability.
+- Post-hoc bias correction (`bias_correction = TRUE/FALSE`).
+- Optional computation of Warm's weighted likelihood estimates (WLE) for person parameters (`estimatewle = TRUE`).
+- Fast Newton-Raphson optimization in C++.
+
+## Simulating Data
+
+We first simulate a dataset of person responses.
+
+```{r simulate-data}
+N <- 100  # persons
+I <- 10   # items
+X <- matrix(rbinom(N * I, 1, 0.5), nrow = N)
+# randomly set 10% of entries to missing
+X[sample(length(X), size = 0.1 * length(X))] <- NA
+head(X)
+
+```
+
+## Basic JML Estimation
+
+Run the JML estimation with centering on "items" (default):
+
+```{r basic-fit}
+fit <- jmle_estimation(
+  X, max_iter = 500, conv = 1e-5,
+  center = "items", bias_correction = FALSE,
+  estimatewle = FALSE, verbose = FALSE
+)
+
+str(fit)
+```
+
+The output is a list with:
+
+- `theta`: person ability estimates
+- `beta`: item difficulty estimates
+- `iterations`: number of NR iterations
+- `converged`: convergence flag
+- `bias_correction`: whether applied
+- `center`: 'items' or 'persons'  
+- `wle_estimate`: person WLEs (if requested)
+
+## Bias Correction
+
+Bias correction rescales item difficulty estimates.
+
+```{r bias-correction}
+fit_bc <- jmle_estimation(X, center = "items", bias_correction = TRUE)
+summary(fit_bc$beta)
+```
+
+Compare to the uncorrected version:
+
+```{r bias-compare}
+summary(fit$beta)
+```
+
+## Warm's WLE Estimates
+
+Warm's weighted likelihood estimates can be obtained in addition to JML estimates.
+
+```{r wle-example}
+fit_wle <- jmle_estimation(X, center = "items", estimatewle = TRUE)
+head(fit_wle$wle_estimate)
+```
+
+## Handling Missing Data
+
+The function handles missing responses (`NA`) without failure:
+
+```{r missing-data}
+X_miss <- X
+X_miss[1:5, 1:2] <- NA
+fit_miss <- jmle_estimation(X_miss, center = "items")
+
+length(fit_miss$theta)
+length(fit_miss$beta)
+```
+
+## Conclusion
+
+The **jmleIRT** package provides a simple and efficient workflow for Rasch JML estimation with useful options such as centering, bias correction, and WLEs, while being robust to missing data.

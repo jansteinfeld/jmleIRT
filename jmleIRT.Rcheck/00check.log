@@ -1,0 +1,166 @@
+* using log directory ‘/Users/jansteinfeld/SynologyDrive/GIT/jmleIRT/jmleIRT.Rcheck’
+* using R version 4.5.2 (2025-10-31)
+* using platform: aarch64-apple-darwin20
+* R was compiled by
+    Apple clang version 16.0.0 (clang-1600.0.26.6)
+    GNU Fortran (GCC) 14.2.0
+* running under: macOS Tahoe 26.1
+* using session charset: UTF-8
+* using option ‘--as-cran’
+* checking for file ‘jmleIRT/DESCRIPTION’ ... OK
+* this is package ‘jmleIRT’ version ‘0.0.2-5’
+* package encoding: UTF-8
+* checking CRAN incoming feasibility ... NOTE
+Maintainer: ‘Jan Steinfeld <jan.d.steinfeld@gmail.com>’
+
+New submission
+
+Found the following (possibly) invalid URLs:
+  URL: https://cran.r-project.org/web/checks/check_results_jmleIRT.html
+    From: README.md
+    Status: Error
+    Message: libcurl error code 16
+* checking package namespace information ... OK
+* checking package dependencies ... OK
+* checking if this is a source package ... OK
+* checking if there is a namespace ... OK
+* checking for executable files ... OK
+* checking for hidden files and directories ... OK
+* checking for portable file names ... OK
+* checking for sufficient/correct file permissions ... OK
+* checking serialization versions ... OK
+* checking whether package ‘jmleIRT’ can be installed ... WARNING
+Found the following significant warnings:
+  /Library/Frameworks/R.framework/Resources/include/R_ext/Boolean.h:62:36: warning: unknown warning group '-Wfixed-enum-extension', ignored [-Wunknown-warning-option]
+  Warning: /Users/jansteinfeld/SynologyDrive/GIT/jmleIRT/jmleIRT.Rcheck/00_pkg_src/jmleIRT/man/biasCorrection.Rd:10: unknown macro '\hat'
+  Warning: /Users/jansteinfeld/SynologyDrive/GIT/jmleIRT/jmleIRT.Rcheck/00_pkg_src/jmleIRT/man/biasCorrection.Rd:10: unknown macro '\theta'
+  Warning: /Users/jansteinfeld/SynologyDrive/GIT/jmleIRT/jmleIRT.Rcheck/00_pkg_src/jmleIRT/man/biasCorrection.Rd:12: unknown macro '\hat'
+  Warning: /Users/jansteinfeld/SynologyDrive/GIT/jmleIRT/jmleIRT.Rcheck/00_pkg_src/jmleIRT/man/biasCorrection.Rd:12: unknown macro '\beta'
+  Warning: /Users/jansteinfeld/SynologyDrive/GIT/jmleIRT/jmleIRT.Rcheck/00_pkg_src/jmleIRT/man/biasCorrection.Rd:39: unknown macro '\hat'
+  Warning: /Users/jansteinfeld/SynologyDrive/GIT/jmleIRT/jmleIRT.Rcheck/00_pkg_src/jmleIRT/man/biasCorrection.Rd:45: unknown macro '\frac'
+  Warning: /Users/jansteinfeld/SynologyDrive/GIT/jmleIRT/jmleIRT.Rcheck/00_pkg_src/jmleIRT/man/biasCorrection.Rd:45: unknown macro '\theta'
+  Warning: /Users/jansteinfeld/SynologyDrive/GIT/jmleIRT/jmleIRT.Rcheck/00_pkg_src/jmleIRT/man/biasCorrection.Rd:45: unknown macro '\beta'
+See ‘/Users/jansteinfeld/SynologyDrive/GIT/jmleIRT/jmleIRT.Rcheck/00install.out’ for details.
+* used C++ compiler: ‘Homebrew clang version 21.1.6’
+* used SDK: ‘MacOSX26.1.sdk’
+* checking installed package size ... OK
+* checking package directory ... OK
+* checking for future file timestamps ... OK
+* checking ‘build’ directory ... OK
+* checking DESCRIPTION meta-information ... OK
+* checking top-level files ... NOTE
+Non-standard file/directory found at top level:
+  ‘README.rmd’
+* checking for left-over files ... OK
+* checking index information ... OK
+* checking package subdirectories ... OK
+* checking code files for non-ASCII characters ... OK
+* checking R files for syntax errors ... OK
+* checking whether the package can be loaded ... OK
+* checking whether the package can be loaded with stated dependencies ... OK
+* checking whether the package can be unloaded cleanly ... OK
+* checking whether the namespace can be loaded with stated dependencies ... OK
+* checking whether the namespace can be unloaded cleanly ... OK
+* checking whether startup messages can be suppressed ... OK
+* checking use of S3 registration ... OK
+* checking dependencies in R code ... OK
+* checking S3 generic/method consistency ... OK
+* checking replacement functions ... OK
+* checking foreign function calls ... OK
+* checking R code for possible problems ... NOTE
+biasCorrection: no visible global function definition for
+  ‘biasCorrectionJMLE_cpp’
+biasCorrection.jmleIRT: no visible global function definition for
+  ‘biasCorrectionJMLE_cpp’
+Undefined global functions or variables:
+  biasCorrectionJMLE_cpp
+* checking Rd files ... WARNING
+prepare_Rd: ./man/biasCorrection.Rd:10: unknown macro '\hat'
+prepare_Rd: ./man/biasCorrection.Rd:10: unknown macro '\theta'
+prepare_Rd: ./man/biasCorrection.Rd:12: unknown macro '\hat'
+prepare_Rd: ./man/biasCorrection.Rd:12: unknown macro '\beta'
+prepare_Rd: ./man/biasCorrection.Rd:39: unknown macro '\hat'
+prepare_Rd: ./man/biasCorrection.Rd:45: unknown macro '\frac'
+prepare_Rd: ./man/biasCorrection.Rd:45: unknown macro '\theta'
+prepare_Rd: ./man/biasCorrection.Rd:45: unknown macro '\beta'
+checkRd: (-1) biasCorrection.Rd:10: Lost braces
+    10 | \item{theta}{Numeric vector of estimated person parameters \(\hat{\theta}\).}
+       |                                                                  ^
+checkRd: (-1) biasCorrection.Rd:12: Lost braces
+    12 | \item{beta}{Numeric vector of estimated item parameters \(\hat{\beta}\).}
+       |                                                               ^
+checkRd: (-1) biasCorrection.Rd:39: Lost braces
+    39 | where \(\hat{B}\) is estimated based on the observed scores \(u_i\) and the expected Fisher information \(v_i\),
+       |             ^
+checkRd: (-1) biasCorrection.Rd:45: Lost braces; missing escapes or markup?
+    45 | where \(p_{ni} = \frac{e^{\theta_n - \beta_i}}{1 + e^{\theta_n - \beta_i}}\) is the probability that person \(n\)
+       |           ^
+checkRd: (-1) biasCorrection.Rd:45: Lost braces
+    45 | where \(p_{ni} = \frac{e^{\theta_n - \beta_i}}{1 + e^{\theta_n - \beta_i}}\) is the probability that person \(n\)
+       |                       ^
+checkRd: (-1) biasCorrection.Rd:45: Lost braces
+    45 | where \(p_{ni} = \frac{e^{\theta_n - \beta_i}}{1 + e^{\theta_n - \beta_i}}\) is the probability that person \(n\)
+       |                          ^
+checkRd: (-1) biasCorrection.Rd:45: Lost braces
+    45 | where \(p_{ni} = \frac{e^{\theta_n - \beta_i}}{1 + e^{\theta_n - \beta_i}}\) is the probability that person \(n\)
+       |                                               ^
+checkRd: (-1) biasCorrection.Rd:45: Lost braces
+    45 | where \(p_{ni} = \frac{e^{\theta_n - \beta_i}}{1 + e^{\theta_n - \beta_i}}\) is the probability that person \(n\)
+       |                                                      ^
+* checking Rd metadata ... OK
+* checking Rd line widths ... OK
+* checking Rd cross-references ... OK
+* checking for missing documentation entries ... WARNING
+Undocumented code objects:
+  ‘print.jmleIRT’ ‘summary.biasCorrection’
+All user-level objects in a package should have documentation entries.
+See chapter ‘Writing R documentation files’ in the ‘Writing R
+Extensions’ manual.
+* checking for code/documentation mismatches ... OK
+* checking Rd \usage sections ... WARNING
+Documented arguments not in \usage in Rd file 'summary.jmleIRT.Rd':
+  ‘digits’
+
+Functions with \usage entries need to have the appropriate \alias
+entries, and all their arguments documented.
+The \usage entries must correspond to syntactically valid R code.
+See chapter ‘Writing R documentation files’ in the ‘Writing R
+Extensions’ manual.
+* checking Rd contents ... OK
+* checking for unstated dependencies in examples ... OK
+* checking line endings in C/C++/Fortran sources/headers ... OK
+* checking pragmas in C/C++ headers and code ... OK
+* checking compilation flags used ... OK
+* checking compiled code ... OK
+* checking installed files from ‘inst/doc’ ... OK
+* checking files in ‘vignettes’ ... OK
+* checking examples ... OK
+* checking for unstated dependencies in ‘tests’ ... OK
+* checking tests ... ERROR
+  Running ‘testthat.R’
+Running the tests in ‘tests/testthat.R’ failed.
+Last 13 lines of output:
+  Saving _problems/test-bias_correction-7.R
+  [ FAIL 1 | WARN 0 | SKIP 0 | PASS 90 ]
+  
+  ══ Failed tests ════════════════════════════════════════════════════════════════
+  ── Error ('test-bias_correction.r:7:3'): Bias-Korrektur verändert Schätzer wie erwartet ──
+  <getvarError/missingArgError/error/condition>
+  Error in `biasCorrectionJMLE(theta, beta, X, I)`: argument "I" is missing, with no default
+  Backtrace:
+      ▆
+   1. └─jmleIRT:::biasCorrectionJMLE(theta, beta, X, I) at test-bias_correction.r:7:3
+  
+  [ FAIL 1 | WARN 0 | SKIP 0 | PASS 90 ]
+  Error:
+  ! Test failures.
+  Execution halted
+* checking for unstated dependencies in vignettes ... OK
+* checking package vignettes ... OK
+* checking re-building of vignette outputs ... OK
+* checking PDF version of manual ... OK
+* checking HTML version of manual ... OK
+* checking for non-standard things in the check directory ... OK
+* checking for detritus in the temp directory ... OK
+* DONE
+Status: 1 ERROR, 4 WARNINGs, 3 NOTEs

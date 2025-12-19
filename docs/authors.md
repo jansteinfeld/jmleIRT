@@ -15,12 +15,12 @@ Source:
 
 Steinfeld, J. and Robitzsch, A. (2025). jmleIRT: {J}oint Maximum
 Likelihood Estimation of the Rasch Model. R package version
-0.0.2-5https://CRAN.R-project.org/package=jmleIRT
+0.0.3-5https://CRAN.R-project.org/package=jmleIRT
 
     @Manual{,
       title = {jmleIRT: {J}oint Maximum Likelihood Estimation of the Rasch Model},
       author = {Jan Steinfeld and Alexander Robitzsch},
       year = {2025},
-      note = {R package version 0.0.2-5},
+      note = {R package version 0.0.3-5},
       url = {https://CRAN.R-project.org/package=jmleIRT},
     }

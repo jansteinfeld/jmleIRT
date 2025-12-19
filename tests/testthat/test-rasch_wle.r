@@ -53,22 +53,21 @@ test_that("estimate_wle respects input validation (matrix and beta length)", {
 }) 
 
 test_that("estimate_jmle optionally returns WLE using final beta", {
-  set.seed(123)
-  X <- matrix(rbinom(80, 1, 0.5), nrow = 20, ncol = 4)
-
+  X <- matrix(rbinom(50, 1, 0.5), nrow = 10, ncol = 5)
   # Run JMLE with WLE enabled; pass a small wle_adj for stability
-  fit <- estimate_jmle(
+  fit <- jmle_estimation(
     X,
     max_iter = 200,
     conv = 1e-6,
     eps = 0.0,
-    bias_correction = FALSE,
+    bias_correction = "none",
     center = "items",
     max_update = 1.5,
     verbose = FALSE,
     estimatewle = TRUE,
     wle_adj = 1e-8
   )
+
 
   expect_true(all(c("theta","beta","iterations","converged","bias_correction","center","wle_estimate") %in% names(fit)))
   # wle_estimate present and length equals nrow(X)

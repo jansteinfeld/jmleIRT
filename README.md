@@ -23,9 +23,10 @@ checks](https://badges.cranchecks.info/summary/jmleIRT.svg)](https://cran.r-proj
 ## Overview
 
 The `jmleIRT` package includes **Joint Maximum Likelihood Estimation
-(JMLE)** for the Rasch model (1PL). It incorporates some selected **bias
-correction techniques** and offers **Warm’s Weighted Likelihood
-Estimates (WLE)** for person ability estimation.
+(JMLE)** of person abilities and item difficulties for the Rasch model
+(1PL). It incorporates some selected **bias correction techniques** and
+offers **Warm’s Weighted Likelihood Estimates (WLE)** for person ability
+estimation.
 
 ------------------------------------------------------------------------
 
@@ -67,7 +68,7 @@ X <- matrix(rbinom(40 * 5, 1, 0.5), nrow = 40)
 
 # Estimate Rasch model using JMLE with bias correction
 fit <- jmle_estimation(X, max_iter = 200, conv = 1e-5,
-                      center = "items", bias_correction = TRUE)
+                      center = "items", bias_correction = "simple")
 
 # Item difficulties (centered)
 print(fit$beta)
@@ -77,6 +78,10 @@ wle_res <- estimate_wle(X, fit$beta)
 
 # Person ability estimates via WLE
 print(wle_res$wle)
+
+# Plot item characteristic curves
+plot(fit, type = "hist")
+plot(fit, type = "icc", items = 1:3)
 ```
 
 ------------------------------------------------------------------------
@@ -122,19 +127,80 @@ implements two key bias correction techniques:
   during the estimation process. This adjustment prevents infinite
   log-odds for perfect or zero scores, ensuring finite item difficulty
   and ability estimates. It also helps alleviate bias related to extreme
-  response patterns by smoothing the estimation.
-- **Analytical bias correction:** This approach involves modifying the
-  item difficulty estimates based on theoretical bias expressions
-  derived from asymptotic expansions or minimum divergence estimators.
-  It aims to reduce the structural bias inherent in the JMLE estimates
-  as described in psychometric literature (e.g., Bertoli Barsotti &
-  Punzo, 2012; Lando & Bertoli Barsotti, 2014).
+  response patterns by smoothing the estimation. The adjustment is
+  controlled by the argument `eps` in `jmle_estimation()`. When
+  `eps > 0`, a small positive constant is used to regularize extreme
+  response patterns; when `eps = 0` (default), persons with all 0 or all
+  1 responses are excluded from the iterative updates and assigned ±Inf
+  afterward.
+
+- **Simple post-hoc bias correction:** The option
+  `bias_correction = TRUE` in `jmle_estimation()` applies a simple
+  finite-sample scaling of item difficulties (factor (I − 1)/I) as a
+  fast bias-reduction heuristic.
+
+- **Analytical bias correction:** The function `biasCorrection()`
+  applies a separate, more elaborate first-order analytic correction
+  based on score and information terms for person and item parameters.
+  This approach involves modifying the item difficulty estimates based
+  on theoretical bias expressions derived from asymptotic expansions or
+  minimum divergence estimators. It aims to reduce the structural bias
+  inherent in the JMLE estimates as described in psychometric literature
+  (e.g., Bertoli Barsotti & Punzo, 2012; Lando & Bertoli Barsotti,
+  2014).
 
 In combination, the epsilon adjustment promotes numerical stability and
 improved bias behavior at the estimation level, while analytical bias
 correction provides targeted, theoretically grounded refinement of item
 parameter estimates to enhance overall accuracy and robustness of the
 JMLE algorithm.
+
+## Bias correction modes
+
+The `jmleIRT` package offers three levels of bias correction for the
+JMLE estimates, controlled by the argument `bias_correction` in
+`jmle_estimation()`:
+
+- **`"none"`**: Plain JMLE without any bias correction. This is the
+  classical joint ML estimator and is useful as a baseline, but is known
+  to be biased in finite samples.
+
+- **`"simple"`**: A fast finite-sample adjustment that rescales item
+  difficulties by a factor $(I - 1)/I$, where $I$ is the number of
+  items. This provides a quick reduction of the small-sample bias in
+  item parameters.
+
+- **`"analytic"`**: A first-order analytical bias correction based on
+  score and information terms for persons and items. Internally,
+  `jmle_estimation(..., bias_correction = "analytic")` first computes
+  the JMLE solution and then calls `biasCorrection()` to obtain
+  corrected parameters. The result object contains both the raw JMLE
+  (`theta`, `beta`) and the analytically corrected estimates
+  (`theta_analytic`, `beta_analytic`).
+
+- Use `"none"` for didactic purposes and to reproduce classical JMLE
+  results.
+
+- Use `"simple"` for ‘quick, low-cost bias reduction’ in item
+  difficulties.
+
+- Use `"analytic"` when sample size is moderate to large (N \>\> I) and
+  bias in both person and item parameters is a concern.
+
+## Person ability estimates: JMLE vs WLE
+
+By default, `jmle_estimation()` returns joint ML person estimates
+`theta`. For reporting individual abilities, **Warm’s Weighted
+Likelihood Estimates (WLE)** often have better bias properties.
+
+- Set `estimatewle = TRUE` in `jmle_estimation()` to obtain WLEs in
+  `fit$wle_estimate`.
+- The joint ML estimates (`fit$theta`) are primarily useful for
+  calibration and comparison with other Rasch estimation methods.
+
+The object returned by `jmle_estimation()` also contains approximate
+standard errors for person and item parameters (`se_theta`, `se_beta`),
+computed from the observed information at the final JMLE solution.
 
 ## Package Features
 

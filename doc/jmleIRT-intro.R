@@ -22,14 +22,14 @@ head(X)
 ## ----basic-fit----------------------------------------------------------------
 fit <- jmle_estimation(
   X, max_iter = 500, conv = 1e-5,
-  center = "items", bias_correction = FALSE,
+  center = "items", bias_correction = "none",
   estimatewle = FALSE, verbose = FALSE
 )
 
 str(fit)
 
 ## ----bias-correction----------------------------------------------------------
-fit_bc <- jmle_estimation(X, center = "items", bias_correction = TRUE)
+fit_bc <- jmle_estimation(X, center = "items", bias_correction = "simple")
 summary(fit_bc$beta)
 
 ## ----bias-compare-------------------------------------------------------------

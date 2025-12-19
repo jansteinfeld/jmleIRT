@@ -3,8 +3,8 @@ test_that("RcppExports wrappers callable", {
   beta <- rep(0, ncol(X))
   out_wle <- estimate_wle(X, beta, max_iter = 10L)
   expect_true(is.list(out_wle))
-  out_jml <- estimate_jmle(
-    X, max_iter = 10L, conv = 1e-4, eps = 0, bias_correction = FALSE,
+  out_jml <- jmle_estimation(
+    X, max_iter = 10L, conv = 1e-4, eps = 0, bias_correction = "none",
     center = "items", max_update = 1.0, verbose = FALSE, estimatewle = FALSE
   )
   expect_true(is.list(out_jml))

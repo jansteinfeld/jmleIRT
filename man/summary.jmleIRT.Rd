@@ -7,10 +7,10 @@
 \method{summary}{jmleIRT}(object, digits = 4, ...)
 }
 \arguments{
-\item{object}{An object of class \code{"jmleIRT"} containing numeric vectors 
-  \code{theta} and \code{beta}.
-If not a strict fit object, it must still provide \code{theta} and 
-  \code{beta} accessible as \code{object$theta} and \code{object$beta}.}
+\item{object}{An object of class \code{"jmleIRT"} containing numeric vectors
+\code{theta} and \code{beta}.
+If not a strict fit object, it must still provide \code{theta} and
+\code{beta} accessible as \code{object$theta} and \code{object$beta}.}
 
 \item{digits}{Number of digits for numeric rounding (default 4).}
 

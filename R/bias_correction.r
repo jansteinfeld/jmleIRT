@@ -18,45 +18,51 @@
 #' \hat{B}_i \approx \frac{E[v_i u_i]}{E[v_i^2]}.
 #' }
 #' In this implementation, scores and information are calculated based on the logistic form of the Rasch model,
-#' where \eqn{p_{ni} = \frac{e^{\theta_n - \beta_i}}{1 + e^{\theta_n - \beta_i}}} is the probability that person \eqn{n}
+#' where \eqn{p_{pi} = \frac{e^{\theta_p - \beta_i}}{1 + e^{\theta_p - \beta_i}}} is the probability that person \eqn{p}
 #' correctly answers item \eqn{i}.
 #'
 #' Missing responses (NA) in the data matrix \eqn{X} are handled by omitting those entries.
 #'
+#' @param jmle_obj optional An object of class \code{"jmleIRT"} as returned by
 #' @param theta Numeric vector of estimated person parameters \eqn{\hat{\theta}}.
 #' @param beta Numeric vector of estimated item parameters \eqn{\hat{\beta}}.
 #' @param X Numeric matrix of responses (persons by items), coded as 0/1, with NA allowed for missing responses.
 #' @param I Integer scalar representing the number of items (used for bias scaling).
+#' @param ... further arguments, but currently unused.
 #'
 #' @return A named list containing bias-corrected parameter vectors:
 #' \describe{
-#'   \item{theta}{Numeric vector of bias-corrected person parameters.}
-#'   \item{beta}{Numeric vector of bias-corrected item parameters.}
+#' \item{theta}{Numeric vector of bias-corrected person parameters.}
+#' \item{beta}{Numeric vector of bias-corrected item parameters.}
 #' }
 #'
 #' @details
+#' Let \eqn{P} denote the number of persons and \eqn{I} the number of items. 
+#' Let \eqn{X} be a \eqn{P \times I} matrix with entries \eqn{X_{pi} \in \{0,1\}} 
+#' (with NA allowed for missing responses).
+#'
 #' The bias correction is inspired by the incidental parameters literature (Neyman & Scott, 1948;
 #' Lancaster, 2000; Arellano & Hahn, 2006), which shows that Maximum Likelihood estimators
 #' in models with many nuisance parameters (like person parameters in Rasch) are biased when
 #' the number of observations per parameter is limited.
 #'
 #' This function applies a computationally efficient closed-form bias correction using the first and second derivatives
-#' of the log-likelihood of the Rasch model likelihood function, evaluated at the JML estimates.
+#' of the Rasch model log-likelihood function, evaluated at the JML estimates.
 #'
 #' The estimator reduces bias by estimating expected score and information terms:
 #' \deqn{
-#' u_{ni} = X_{ni} - p_{ni}, \quad v_{ni} = p_{ni} (1 - p_{ni})
+#' u_{pi} = X_{pi} - p_{pi}, \quad v_{pi} = p_{pi} (1 - p_{pi})
 #' }
-#' for person \eqn{n} and item \eqn{i}, and then aggregating these across items or persons.
+#' for person \eqn{p} and item \eqn{i}, and then aggregating these across items or persons.
 #'
-#' The bias terms for person \eqn{n} and item \eqn{i} are estimated as:
+#' The bias terms for person \eqn{p} and item \eqn{i} are estimated as:
 #' \deqn{
-#' \hat{B}_{\theta,n} = \frac{\sum_i v_{ni} u_{ni}}{\sum_i v_{ni}^2}, \quad
-#' \hat{B}_{\beta,i} = \frac{\sum_n v_{ni} (p_{ni} - X_{ni})}{\sum_n v_{ni}^2}
+#' \hat{B}_{\theta,p} = \frac{\sum_i v_{pi} u_{pi}}{\sum_i v_{pi}^2}, \quad
+#' \hat{B}_{\beta,i} = \frac{\sum_p v_{pi} (p_{pi} - X_{pi})}{\sum_p v_{pi}^2}
 #' }
 #'
 #' This method is applicable when the number of items \eqn{I} is fixed and moderate, and
-#' the number of persons \eqn{N} is large.
+#' the number of persons \eqn{P} is large.
 #'
 #' @references
 #' - Neyman, J., & Scott, E. L. (1948). Consistent Estimates Based on Partially Consistent Observations. Econometrica, 16(1), 1-32.
@@ -70,44 +76,58 @@
 #' theta <- c(0.5, -0.5)
 #' beta <- c(-0.2, 0.1, 0.3, -0.1)
 #' I <- ncol(X)
-#' corrected <- biasCorrectionJMLE(theta, beta, X, I)
+#' corrected <- biasCorrection(theta = theta, beta = beta, X = X, I = I)
 #' print(corrected$theta)
 #' print(corrected$beta)
 #' }
 #' @export
-biasCorrection <- function(theta, beta, X, I) {
+biasCorrection <- function(jmle_obj = NULL, theta, beta, X, I, ...) {
+  UseMethod("biasCorrection")
+}
+
+#' @export
+#' @method biasCorrection default
+biasCorrection.default <- function(jmle_obj = NULL, theta, beta, X, I, ...) {
   stopifnot(is.numeric(theta))
   stopifnot(is.numeric(beta))
   stopifnot(is.matrix(X))
   stopifnot(is.numeric(I))
 
-  N <- nrow(X)
+  P <- nrow(X)
   I <- ncol(X)
 
-  res <- biasCorrectionJMLE(theta = theta, beta = beta, X = X, N = N, I = I)
-  # Attach a class for downstream methods
+  res <- biasCorrectionJMLE(theta = theta, beta = beta, X = X, N = P, I = I)
   class(res) <- c("biasCorrection", class(res))
   res
 }
-biasCorrection.jmleIRT <- function(jmle_obj) {
+
+#' Analytical bias correction for jmleIRT objects
+#'
+#' Applies the C++ first-order bias correction to an object of class
+#' \code{jmleIRT} and returns corrected person and item parameters.
+#'
+#' @param jmle_obj An object of class \code{"jmleIRT"} as returned by
+#' @param theta Person parameters (ignored if jmle_obj is provided)
+#' @param beta Item parameters (ignored if jmle_obj is provided)
+#' @param X Response matrix (ignored if jmle_obj is provided)
+#' @param I Number of items (ignored if jmle_obj is provided)
+#' \code{jmle_estimation()}.
+#' @param ... further arguments, but currently unused.
+#' @return An object of class \code{"biasCorrection"} containing numeric
+#' vectors \code{theta} and \code{beta}.
+#' @method biasCorrection jmleIRT
+#' @export
+biasCorrection.jmleIRT <- function(jmle_obj, theta=NULL, beta=NULL, X=NULL, I=NULL,...) {
   if (missing(jmle_obj) || !inherits(jmle_obj, "jmleIRT")) {
     stop("You must provide a valid 'jmleIRT' object.")
   }
 
-  # Extract necessary components from jmle_obj
   theta <- jmle_obj$theta
   beta <- jmle_obj$beta
   X <- jmle_obj$data
   I <- ncol(X)
 
-  N <- nrow(X)
-  I <- ncol(X)
-
-  # Call your internal C++ bias correction function
-  res <- biasCorrectionJMLE(theta = theta, beta = beta, X = X, N = N, I = I)
-
-  # Attach class for downstream methods
+  res <- biasCorrectionJMLE(theta = theta, beta = beta, X = X, N = nrow(X), I = I)
   class(res) <- c("biasCorrection", class(res))
-
-  return(res)
+  res
 }

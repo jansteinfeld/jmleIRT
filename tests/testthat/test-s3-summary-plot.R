@@ -8,6 +8,15 @@ X <- matrix(c(
   0, 0, 0, NA
 ), nrow = 5, byrow = TRUE)
 
+make_X <- function(N = 10, I = 6, na_frac = 0.1) {
+  X <- matrix(rbinom(N * I, 1, 0.5), nrow = N)
+  if (na_frac > 0) {
+    nNA <- ceiling(length(X) * na_frac)
+    X[sample(length(X), nNA)] <- NA
+  }
+  X
+}
+
 test_that("jmle_estimation runs and returns expected structure", {
   res <- jmle_estimation(X, max_iter = 200, estimatewle = TRUE, verbose = FALSE, center = "items")
   expect_s3_class(res, "jmleIRT")
@@ -52,7 +61,7 @@ test_that("center argument centers beta and shifts theta accordingly", {
 })
 
 test_that("bias_correction scales betas appropriately", {
-  res_bc <- jmle_estimation(X, bias_correction = TRUE, center = "items")
+  res_bc <- jmle_estimation(X, bias_correction = "simple", center = "items")
   expect_true(!all(abs(res_bc$beta) == 0))
 })
 
@@ -67,4 +76,12 @@ test_that("max_update clips parameter update sizes", {
 
 test_that("verbose option prints progress messages", {
   expect_output(jmle_estimation(X, verbose = TRUE, center = "items"), "Iter")
+})
+
+test_that("biasCorrection.jmleIRT works", {
+  X <- make_X(20, 6)
+  fit <- jmle_estimation(X, center = "items")
+  bc <- biasCorrection(fit)
+  expect_s3_class(bc, "biasCorrection")
+  expect_named(bc, c("theta", "beta"))
 })

@@ -3,10 +3,10 @@
 #' Print a summary of the Joint Maximum Likelihood Estimation (JMLE) Rasch model results,
 #' including number of iterations, item difficulties, and person ability parameters.
 #'
-#' @param object An object of class \code{"jmleIRT"} containing numeric vectors 
-#'   \code{theta} and \code{beta}.
-#' If not a strict fit object, it must still provide \code{theta} and 
-#'   \code{beta} accessible as \code{object$theta} and \code{object$beta}.
+#' @param object An object of class \code{"jmleIRT"} containing numeric vectors
+#' \code{theta} and \code{beta}.
+#' If not a strict fit object, it must still provide \code{theta} and
+#' \code{beta} accessible as \code{object$theta} and \code{object$beta}.
 #' @param digits Number of digits for numeric rounding (default 4).
 #' @param ... Additional arguments passed to or from other methods (currently unused).
 #'
@@ -38,10 +38,11 @@ summary.jmleIRT <- function(object, digits = 4, ...) {
   wle <- object$wle_estimate
   conv <- object$converged
   iter <- object$iterations
-  bias_corr <- object$bias_correction
-  centered <- object$centered
-  n_persons <- length(theta)
-  n_items <- length(beta)
+  bias_corr <- object$bias_correction_mode
+  center <- object$center
+
+  p_persons <- length(theta)
+  i_items <- length(beta)
 
   # Helper for statistics printing
   print_stats <- function(x) {
@@ -55,12 +56,12 @@ summary.jmleIRT <- function(object, digits = 4, ...) {
 
   cat("Joint Maximum Likelihood Estimation of Rasch Model\n")
   cat("-----------------------------------------------\n")
-  cat("Number of persons:", n_persons, "\n")
-  cat("Number of items :", n_items, "\n")
-  cat("Converged :", conv, "\n")
-  cat("Iterations :", iter, "\n")
-  cat("Bias correction :", bias_corr, "\n")
-  cat("Centered (mean beta=0):", centered, "\n\n")
+  cat("Number of persons:", p_persons, "\n")
+  cat("Number of items  :", i_items, "\n")
+  cat("Converged        :", conv, "\n")
+  cat("Iterations       :", iter, "\n")
+  cat("Bias correction  :", bias_corr, "\n")
+  cat("Centered (mean beta=0):", center, "\n\n")
 
   cat("Person parameters (theta):\n")
   print(round(print_stats(theta), digits = digits))
@@ -80,21 +81,19 @@ summary.jmleIRT <- function(object, digits = 4, ...) {
 #'
 #' Print a summary of bias-corrected item difficulty and person ability estimates.
 #'
-#' @param object Object of class \code{"biasCorrection"} containing \code{corrected_b} and \code{corrected_theta}.
+#' @param object Object of class \code{"biasCorrection"} containing \code{beta} and \code{theta}.
 #' @param ... Additional arguments (currently unused).
 #'
 #' @return The input \code{object}, invisibly.
 #'
 #' @export
+#' @export
 summary.biasCorrection <- function(object, ...) {
   cat("Summary of Bias Corrected Estimates\n")
   cat("-----------------------------------\n")
-
   cat("Corrected item difficulties:\n")
-  print(summary(object$corrected_b))
-
+  print(summary(object$beta))
   cat("Corrected person abilities:\n")
-  print(summary(object$corrected_theta))
-
+  print(summary(object$theta))
   invisible(object)
 }

@@ -10,7 +10,7 @@
 #' Defaults to 1 for all respondents.
 #' @param conv Numeric value specifying the convergence criterion for iteration.
 #' Defaults to 0.001.
-#' @param maxiter Integer specifying the max number of iterations.
+#' @param maxiter Integer specifying the maximum number of iterations.
 #' Defaults to 30.
 #' @return A list with elements:
 #' \describe{

@@ -1,7 +1,7 @@
 Package: jmleIRT
 Title: Joint Maximum Likelihood Estimation of the Rasch Model
-Version: 0.0.2-5
-Date: 2025-11-07
+Version: 0.0.3-5
+Date: 2025-12-17
 Authors@R: c(
   person(given = "Jan", 
          family = "Steinfeld", 
@@ -29,7 +29,7 @@ Language: en-US
 Encoding: UTF-8
 VignetteBuilder: knitr
 NeedsCompilation: yes
-Imports: Rcpp
+Imports: Rcpp, Matrix
 LinkingTo: Rcpp, RcppEigen
 Suggests: knitr,rmarkdown,prettydoc,testthat (>= 3.0.0),ggplot2,covr
 RoxygenNote: 7.3.3

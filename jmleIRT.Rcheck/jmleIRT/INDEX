@@ -1,8 +1,0 @@
-biasCorrection          Analytical First-Order Bias Correction for
-                        Joint Maximum Likelihood Estimators in the
-                        Rasch Model
-estimate_rasch_model    High-level Rasch model estimation
-jmle_estimation         Fit Rasch model by JML with optional WLE
-prox_algorithm          PROX Estimation for the Rasch Model
-summary.jmleIRT         Summary of JML estimation
-wle_estimation          Compute Warm's WLE for given item difficulties

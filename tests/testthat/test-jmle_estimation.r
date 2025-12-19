@@ -9,13 +9,14 @@ make_X <- function(N = 10, I = 6, na_frac = 0.1) {
   X
 }
 
+
 # --- Basic functionality ---
 test_that("jmle_estimation runs and returns expected structure", {
   X <- make_X(20, 8, na_frac = 0.15)
   fit <- jmle_estimation(
     X,
     max_iter = 200, conv = 1e-5, eps = 0,
-    bias_correction = FALSE, center = "items",
+    bias_correction = "none", center = "items",
     max_update = 1.5, verbose = FALSE, estimatewle = FALSE
   )
   expect_type(fit$theta, "double")
@@ -42,8 +43,11 @@ test_that("jmle_estimation computes WLE when requested", {
 # --- Bias correction ---
 test_that("jmle_estimation applies bias correction option", {
   X <- make_X(25, 7)
-  fit1 <- jmle_estimation(X, bias_correction = FALSE, center = "items")
-  fit2 <- jmle_estimation(X, bias_correction = TRUE, center = "items")
+  fit1 <- jmle_estimation(X, bias_correction = "none", center = "items")
+  fit2 <- jmle_estimation(X, bias_correction = "simple", center = "items")
+  fit3 <- jmle_estimation(X, bias_correction = "analytic", center = "items")
+  expect_true("theta_analytic" %in% names(fit3))
+  expect_true("beta_analytic" %in% names(fit3))
   expect_equal(length(fit1$beta), length(fit2$beta))
   expect_false(isTRUE(all.equal(fit1$beta, fit2$beta)))
 })
@@ -64,7 +68,14 @@ test_that("jmle_estimation errors on invalid input", {
   expect_error(jmle_estimation(matrix("a", 5, 5)),
     regexp = "numeric matrix"
   )
-  expect_error(estimate_jmle(matrix("a", 5, 5)),
-    regexp = "numeric matrix"
-  )
+})
+
+
+test_that("jmle_estimation applies analytic bias correction", {
+  X <- make_X(20, 6)
+  fit <- jmle_estimation(X, bias_correction = "analytic", center = "items")
+  expect_true("theta_analytic" %in% names(fit))
+  expect_true("beta_analytic" %in% names(fit))
+  expect_equal(length(fit$theta_analytic), nrow(X))
+  expect_equal(length(fit$beta_analytic), ncol(X))
 })

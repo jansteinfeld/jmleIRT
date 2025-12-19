@@ -44,8 +44,8 @@ BEGIN_RCPP
 END_RCPP
 }
 // estimate_jmle
-Rcpp::List estimate_jmle(SEXP X_, int max_iter, double conv, double eps, bool bias_correction, std::string center, double max_update, bool verbose, bool estimatewle, double wle_adj);
-RcppExport SEXP _jmleIRT_estimate_jmle(SEXP X_SEXP, SEXP max_iterSEXP, SEXP convSEXP, SEXP epsSEXP, SEXP bias_correctionSEXP, SEXP centerSEXP, SEXP max_updateSEXP, SEXP verboseSEXP, SEXP estimatewleSEXP, SEXP wle_adjSEXP) {
+Rcpp::List estimate_jmle(SEXP X_, int max_iter, double conv, double eps, SEXP bias_correction_, std::string center, double max_update, bool verbose, bool estimatewle, double wle_adj);
+RcppExport SEXP _jmleIRT_estimate_jmle(SEXP X_SEXP, SEXP max_iterSEXP, SEXP convSEXP, SEXP epsSEXP, SEXP bias_correction_SEXP, SEXP centerSEXP, SEXP max_updateSEXP, SEXP verboseSEXP, SEXP estimatewleSEXP, SEXP wle_adjSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -53,13 +53,13 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< int >::type max_iter(max_iterSEXP);
     Rcpp::traits::input_parameter< double >::type conv(convSEXP);
     Rcpp::traits::input_parameter< double >::type eps(epsSEXP);
-    Rcpp::traits::input_parameter< bool >::type bias_correction(bias_correctionSEXP);
+    Rcpp::traits::input_parameter< SEXP >::type bias_correction_(bias_correction_SEXP);
     Rcpp::traits::input_parameter< std::string >::type center(centerSEXP);
     Rcpp::traits::input_parameter< double >::type max_update(max_updateSEXP);
     Rcpp::traits::input_parameter< bool >::type verbose(verboseSEXP);
     Rcpp::traits::input_parameter< bool >::type estimatewle(estimatewleSEXP);
     Rcpp::traits::input_parameter< double >::type wle_adj(wle_adjSEXP);
-    rcpp_result_gen = Rcpp::wrap(estimate_jmle(X_, max_iter, conv, eps, bias_correction, center, max_update, verbose, estimatewle, wle_adj));
+    rcpp_result_gen = Rcpp::wrap(estimate_jmle(X_, max_iter, conv, eps, bias_correction_, center, max_update, verbose, estimatewle, wle_adj));
     return rcpp_result_gen;
 END_RCPP
 }

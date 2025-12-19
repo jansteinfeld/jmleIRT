@@ -7,7 +7,7 @@
 \method{summary}{biasCorrection}(object, ...)
 }
 \arguments{
-\item{object}{Object of class \code{"biasCorrection"} containing \code{corrected_b} and \code{corrected_theta}.}
+\item{object}{Object of class \code{"biasCorrection"} containing \code{beta} and \code{theta}.}
 
 \item{...}{Additional arguments (currently unused).}
 }

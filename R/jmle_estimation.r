@@ -13,8 +13,18 @@
 #' @param X Numeric matrix of responses (0/1) with possible NA for missing.
 #' @param max_iter Maximum NR iterations in C++ (default 1000).
 #' @param conv Convergence threshold on maximum absolute parameter change.
-#' @param eps Epsilon adjustment for extreme person scores (default 0).
-#' @param bias_correction Logical, simple post-hoc scaling of item betas.
+#' @param eps Small positive value used to adjust extreme person scores.
+#'   When \code{eps = 0} (default), persons with all 0 or all 1 responses
+#'   are excluded from the iterative JMLE updates and assigned -Inf / +Inf
+#'   afterward. When \code{eps > 0}, no deletion is performed and extreme
+#'   scores are regularized internally.
+#' @param bias_correction Character, one of \code{"none"}, \code{"simple"},
+#'   or \code{"analytic"}.
+#'   \code{"none"}: no bias correction;
+#'   \code{"simple"}: fast finite-sample scaling of item difficulties by
+#'   factor (I - 1) / I;
+#'   \code{"analytic"}: post-hoc first-order analytical bias correction
+#'   using \code{biasCorrection()}.
 #' @param center either "items" or "persons"; enforce mean(beta)=0 or mean(theta)=0.
 #' @param max_update Step-size clip per update to stabilize NR (default 1.5).
 #' @param verbose Logical, periodic progress from C++ (every 10 iters).
@@ -22,31 +32,36 @@
 #' @param wle_adj Small adjustment to avoid extreme raw scores in WLE (default 1e-8).
 #'
 #' @return A list with components:
-#'   - theta: numeric vector of person parameters
-#'   - beta: numeric vector of item difficulties (mean 0 if center = TRUE)
-#'   - iterations: integer iterations used
-#'   - converged: logical convergence indicator
-#'   - bias_correction, centered: echoes of inputs
-#'   - wle_estimate: numeric vector of WLE (if estimatewle = TRUE) or NA
+#'  - theta: numeric vector of person parameters
+#' - beta: numeric vector of item difficulties (mean 0 if center = "items")
+#' - iterations: integer iterations used
+#' - converged: logical convergence indicator
+#' - bias_correction_mode: selected bias correction mode
+#' - center: centering used ("items" or "persons")
+#' - wle_estimate: numeric vector of WLE (if estimatewle = TRUE) or NA
+#' - se_theta, se_beta: approximate JMLE-based standard errors (if implemented)
+#' - theta_analytic, beta_analytic: analytically bias-corrected parameters
+#'   if \code{bias_correction = "analytic"}, otherwise \code{NULL}
 #' @export
 jmle_estimation <- function(
   X,
   max_iter = 1000,
   conv = 1e-6,
   eps = 0,
-  bias_correction = FALSE,
+  bias_correction = c("none", "simple", "analytic"),
   center = "items",
   max_update = 1.5,
   verbose = FALSE,
   estimatewle = FALSE,
   wle_adj = 1e-8
 ) {
+  bias_correction <- match.arg(bias_correction)
+
   # Basic validation and coercion
   X <- .coerce_binary_matrix(X)
   stopifnot(is.numeric(max_iter), length(max_iter) == 1L)
   stopifnot(is.numeric(conv), length(conv) == 1L)
   stopifnot(is.numeric(eps), length(eps) == 1L)
-  stopifnot(is.logical(bias_correction), length(bias_correction) == 1L)
   stopifnot(is.character(center), length(center) == 1L)
   stopifnot(is.numeric(max_update), length(max_update) == 1L)
   stopifnot(is.logical(verbose), length(verbose) == 1L)
@@ -59,13 +74,16 @@ jmle_estimation <- function(
     stop("X must have at least one person (row).")
   }
 
+  # Map mode to simple boolean flag for C++
+  do_simple_bc <- bias_correction == "simple"
+  
   # Delegate to compiled routine (Rcpp)
   res <- estimate_jmle(
     X_ = X,
     max_iter = as.integer(max_iter),
     conv = conv,
     eps = eps,
-    bias_correction = bias_correction,
+    bias_correction_ = do_simple_bc,
     center = center,
     max_update = max_update,
     verbose = verbose,
@@ -73,10 +91,19 @@ jmle_estimation <- function(
     wle_adj = wle_adj
   )
 
-  # Attach a class for downstream methods
+  res$bias_correction_mode <- bias_correction
   class(res) <- c("jmleIRT", class(res))
+
+  # Attach analytically bias-corrected parameters if requested
+  if (bias_correction == "analytic") {
+    bc <- biasCorrection(res)
+    res$theta_analytic <- bc$theta
+    res$beta_analytic <- bc$beta
+  }
+
   res
 }
+
 
 #' Compute Warm's WLE for given item difficulties
 #'

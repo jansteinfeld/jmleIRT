@@ -9,7 +9,7 @@ jmle_estimation(
   max_iter = 1000,
   conv = 1e-06,
   eps = 0,
-  bias_correction = FALSE,
+  bias_correction = c("none", "simple", "analytic"),
   center = "items",
   max_update = 1.5,
   verbose = FALSE,
@@ -24,9 +24,19 @@ jmle_estimation(
 
 \item{conv}{Convergence threshold on maximum absolute parameter change.}
 
-\item{eps}{Epsilon adjustment for extreme person scores (default 0).}
+\item{eps}{Small positive value used to adjust extreme person scores.
+When \code{eps = 0} (default), persons with all 0 or all 1 responses
+are excluded from the iterative JMLE updates and assigned -Inf / +Inf
+afterward. When \code{eps > 0}, no deletion is performed and extreme
+scores are regularized internally.}
 
-\item{bias_correction}{Logical, simple post-hoc scaling of item betas.}
+\item{bias_correction}{Character, one of \code{"none"}, \code{"simple"},
+or \code{"analytic"}.
+\code{"none"}: no bias correction;
+\code{"simple"}: fast finite-sample scaling of item difficulties by
+factor (I - 1) / I;
+\code{"analytic"}: post-hoc first-order analytical bias correction
+using \code{biasCorrection()}.}
 
 \item{center}{either "items" or "persons"; enforce mean(beta)=0 or mean(theta)=0.}
 
@@ -40,12 +50,16 @@ jmle_estimation(
 }
 \value{
 A list with components:
-  - theta: numeric vector of person parameters
-  - beta: numeric vector of item difficulties (mean 0 if center = TRUE)
-  - iterations: integer iterations used
-  - converged: logical convergence indicator
-  - bias_correction, centered: echoes of inputs
-  - wle_estimate: numeric vector of WLE (if estimatewle = TRUE) or NA
+ - theta: numeric vector of person parameters
+- beta: numeric vector of item difficulties (mean 0 if center = "items")
+- iterations: integer iterations used
+- converged: logical convergence indicator
+- bias_correction_mode: selected bias correction mode
+- center: centering used ("items" or "persons")
+- wle_estimate: numeric vector of WLE (if estimatewle = TRUE) or NA
+- se_theta, se_beta: approximate JMLE-based standard errors (if implemented)
+- theta_analytic, beta_analytic: analytically bias-corrected parameters
+  if \code{bias_correction = "analytic"}, otherwise \code{NULL}
 }
 \description{
 Fits the Rasch (1PL) model using joint maximum likelihood via an efficient

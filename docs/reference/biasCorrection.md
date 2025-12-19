@@ -7,10 +7,14 @@ parameters in the Rasch model.
 ## Usage
 
 ``` r
-biasCorrection(theta, beta, X, I)
+biasCorrection(jmle_obj = NULL, theta, beta, X, I, ...)
 ```
 
 ## Arguments
+
+- jmle_obj:
+
+  optional An object of class `"jmleIRT"` as returned by
 
 - theta:
 
@@ -29,6 +33,10 @@ biasCorrection(theta, beta, X, I)
 
   Integer scalar representing the number of items (used for bias
   scaling).
+
+- ...:
+
+  further arguments, but currently unused.
 
 ## Value
 
@@ -56,12 +64,16 @@ parameter as: \$\$ \hat{\theta}^{corr} = \hat{\theta} - \frac{1}{I}
 observed scores \\u_i\\ and the expected Fisher information \\v_i\\,
 calculated as \$\$ \hat{B}\_i \approx \frac{E\[v_i u_i\]}{E\[v_i^2\]}.
 \$\$ In this implementation, scores and information are calculated based
-on the logistic form of the Rasch model, where \\p\_{ni} =
-\frac{e^{\theta_n - \beta_i}}{1 + e^{\theta_n - \beta_i}}\\ is the
-probability that person \\n\\ correctly answers item \\i\\.
+on the logistic form of the Rasch model, where \\p\_{pi} =
+\frac{e^{\theta_p - \beta_i}}{1 + e^{\theta_p - \beta_i}}\\ is the
+probability that person \\p\\ correctly answers item \\i\\.
 
 Missing responses (NA) in the data matrix \\X\\ are handled by omitting
 those entries.
+
+Let \\P\\ denote the number of persons and \\I\\ the number of items.
+Let \\X\\ be a \\P \times I\\ matrix with entries \\X\_{pi} \in
+\\0,1\\\\ (with NA allowed for missing responses).
 
 The bias correction is inspired by the incidental parameters literature
 (Neyman & Scott, 1948; Lancaster, 2000; Arellano & Hahn, 2006), which
@@ -70,21 +82,21 @@ parameters (like person parameters in Rasch) are biased when the number
 of observations per parameter is limited.
 
 This function applies a computationally efficient closed-form bias
-correction using the first and second derivatives of the log-likelihood
-of the Rasch model likelihood function, evaluated at the JML estimates.
+correction using the first and second derivatives of the Rasch model
+log-likelihood function, evaluated at the JML estimates.
 
 The estimator reduces bias by estimating expected score and information
-terms: \$\$ u\_{ni} = X\_{ni} - p\_{ni}, \quad v\_{ni} = p\_{ni} (1 -
-p\_{ni}) \$\$ for person \\n\\ and item \\i\\, and then aggregating
+terms: \$\$ u\_{pi} = X\_{pi} - p\_{pi}, \quad v\_{pi} = p\_{pi} (1 -
+p\_{pi}) \$\$ for person \\p\\ and item \\i\\, and then aggregating
 these across items or persons.
 
-The bias terms for person \\n\\ and item \\i\\ are estimated as: \$\$
-\hat{B}\_{\theta,n} = \frac{\sum_i v\_{ni} u\_{ni}}{\sum_i v\_{ni}^2},
-\quad \hat{B}\_{\beta,i} = \frac{\sum_n v\_{ni} (p\_{ni} -
-X\_{ni})}{\sum_n v\_{ni}^2} \$\$
+The bias terms for person \\p\\ and item \\i\\ are estimated as: \$\$
+\hat{B}\_{\theta,p} = \frac{\sum_i v\_{pi} u\_{pi}}{\sum_i v\_{pi}^2},
+\quad \hat{B}\_{\beta,i} = \frac{\sum_p v\_{pi} (p\_{pi} -
+X\_{pi})}{\sum_p v\_{pi}^2} \$\$
 
 This method is applicable when the number of items \\I\\ is fixed and
-moderate, and the number of persons \\N\\ is large.
+moderate, and the number of persons \\P\\ is large.
 
 ## References
 
@@ -104,7 +116,7 @@ X <- matrix(c(1, 0, 1, NA, 1, 0, 1, 1), nrow = 2, byrow = TRUE)
 theta <- c(0.5, -0.5)
 beta <- c(-0.2, 0.1, 0.3, -0.1)
 I <- ncol(X)
-corrected <- biasCorrectionJMLE(theta, beta, X, I)
+corrected <- biasCorrection(theta = theta, beta = beta, X = X, I = I)
 print(corrected$theta)
 print(corrected$beta)
 } # }

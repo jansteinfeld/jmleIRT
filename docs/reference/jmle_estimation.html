@@ -15,7 +15,7 @@ estimates computed with the estimated item difficulties."></head><body>
 
     <a class="navbar-brand me-2" href="../index.html">jmleIRT</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.0.2-5</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.0.3-5</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -66,7 +66,7 @@ estimates computed with the estimated item difficulties.</p>
 <span>  max_iter <span class="op">=</span> <span class="fl">1000</span>,</span>
 <span>  conv <span class="op">=</span> <span class="fl">1e-06</span>,</span>
 <span>  eps <span class="op">=</span> <span class="fl">0</span>,</span>
-<span>  bias_correction <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  bias_correction <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"none"</span>, <span class="st">"simple"</span>, <span class="st">"analytic"</span><span class="op">)</span>,</span>
 <span>  center <span class="op">=</span> <span class="st">"items"</span>,</span>
 <span>  max_update <span class="op">=</span> <span class="fl">1.5</span>,</span>
 <span>  verbose <span class="op">=</span> <span class="cn">FALSE</span>,</span>
@@ -92,11 +92,21 @@ estimates computed with the estimated item difficulties.</p>
 
 
 <dt id="arg-eps">eps<a class="anchor" aria-label="anchor" href="#arg-eps"></a></dt>
-<dd><p>Epsilon adjustment for extreme person scores (default 0).</p></dd>
+<dd><p>Small positive value used to adjust extreme person scores.
+When <code>eps = 0</code> (default), persons with all 0 or all 1 responses
+are excluded from the iterative JMLE updates and assigned -Inf / +Inf
+afterward. When <code>eps &gt; 0</code>, no deletion is performed and extreme
+scores are regularized internally.</p></dd>
 
 
 <dt id="arg-bias-correction">bias_correction<a class="anchor" aria-label="anchor" href="#arg-bias-correction"></a></dt>
-<dd><p>Logical, simple post-hoc scaling of item betas.</p></dd>
+<dd><p>Character, one of <code>"none"</code>, <code>"simple"</code>,
+or <code>"analytic"</code>.
+<code>"none"</code>: no bias correction;
+<code>"simple"</code>: fast finite-sample scaling of item difficulties by
+factor (I - 1) / I;
+<code>"analytic"</code>: post-hoc first-order analytical bias correction
+using <code><a href="biasCorrection.html">biasCorrection()</a></code>.</p></dd>
 
 
 <dt id="arg-center">center<a class="anchor" aria-label="anchor" href="#arg-center"></a></dt>
@@ -122,12 +132,16 @@ estimates computed with the estimated item difficulties.</p>
     <div class="section level2">
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
     <p>A list with components:
-  - theta: numeric vector of person parameters
-  - beta: numeric vector of item difficulties (mean 0 if center = TRUE)
-  - iterations: integer iterations used
-  - converged: logical convergence indicator
-  - bias_correction, centered: echoes of inputs
-  - wle_estimate: numeric vector of WLE (if estimatewle = TRUE) or NA</p>
+ - theta: numeric vector of person parameters
+- beta: numeric vector of item difficulties (mean 0 if center = "items")
+- iterations: integer iterations used
+- converged: logical convergence indicator
+- bias_correction_mode: selected bias correction mode
+- center: centering used ("items" or "persons")
+- wle_estimate: numeric vector of WLE (if estimatewle = TRUE) or NA
+- se_theta, se_beta: approximate JMLE-based standard errors (if implemented)
+- theta_analytic, beta_analytic: analytically bias-corrected parameters
+  if <code>bias_correction = "analytic"</code>, otherwise <code>NULL</code></p>
     </div>
 
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>

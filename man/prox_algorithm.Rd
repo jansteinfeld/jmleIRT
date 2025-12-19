@@ -18,7 +18,7 @@ Defaults to 1 for all respondents.}
 \item{conv}{Numeric value specifying the convergence criterion for iteration.
 Defaults to 0.001.}
 
-\item{maxiter}{Integer specifying the max number of iterations.
+\item{maxiter}{Integer specifying the maximum number of iterations.
 Defaults to 30.}
 }
 \value{

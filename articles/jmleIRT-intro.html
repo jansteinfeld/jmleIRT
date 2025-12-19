@@ -20,7 +20,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">jmleIRT</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.0.2-5</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.0.3-5</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -68,7 +68,7 @@
                         <h4 data-toc-skip class="author">Jan Steinfeld
 &amp; Alexander Robitzsch</h4>
             
-            <h4 data-toc-skip class="date">December 05, 2025</h4>
+            <h4 data-toc-skip class="date">December 19, 2025</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/jansteinfeld/jmleIRT/blob/main/vignettes/jmleIRT-intro.Rmd" class="external-link"><code>vignettes/jmleIRT-intro.Rmd</code></a></small>
       <div class="d-none name"><code>jmleIRT-intro.Rmd</code></div>
@@ -143,14 +143,22 @@ estimates.</li>
 <p>Key features: - Missing values by design are allowed
 (<code>NA</code>). - Optional epsilon adjustment (<code>eps</code>) to
 reduce estimation bias from extreme scores. - Centering based on either
-“items” or “persons” to ensure identifiability. - Post-hoc bias
-correction (<code>bias_correction = TRUE/FALSE</code>). - Optional
-computation of Warm’s weighted likelihood estimates (WLE) for person
-parameters (<code>estimatewle = TRUE</code>). - Fast Newton-Raphson
-optimization in C++.</p>
-<div class="section level3">
-<h3 id="simulating-data">Simulating Data<a class="anchor" aria-label="anchor" href="#simulating-data"></a>
-</h3>
+“items” or “persons” to ensure identifiability. - Optional computation
+of Warm’s weighted likelihood estimates (WLE) for person parameters
+(<code>estimatewle = TRUE</code>). - Fast Newton-Raphson optimization in
+C++. The package implements three levels of bias correction for JMLE
+estimates:</p>
+<ul>
+<li>
+<code>"none"</code>: No bias correction (plain JMLE).</li>
+<li>
+<code>"simple"</code>: Fast finite-sample scaling of item
+difficulties by a factor (I - 1)/I.</li>
+<li>
+<code>"analytic"</code>: First-order analytical bias correction
+using score and information terms.</li>
+<li><h3 id="simulating-data">Simulating Data</h3></li>
+</ul>
 <p>We first simulate a dataset of person responses.</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">N</span> <span class="op">&lt;-</span> <span class="fl">100</span>  <span class="co"># persons</span></span>
@@ -166,7 +174,6 @@ optimization in C++.</p>
 <span><span class="co">#&gt; [4,]    0    0    0    1    0    1    1    1    1     1</span></span>
 <span><span class="co">#&gt; [5,]   NA    0   NA    0    0    0   NA    1    0     0</span></span>
 <span><span class="co">#&gt; [6,]    0    1    1    0    0    1    1    0    0     0</span></span></code></pre></div>
-</div>
 <div class="section level3">
 <h3 id="basic-jml-estimation">Basic JML Estimation<a class="anchor" aria-label="anchor" href="#basic-jml-estimation"></a>
 </h3>
@@ -174,20 +181,21 @@ optimization in C++.</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">fit</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/jmle_estimation.html">jmle_estimation</a></span><span class="op">(</span></span>
 <span>  <span class="va">X</span>, max_iter <span class="op">=</span> <span class="fl">500</span>, conv <span class="op">=</span> <span class="fl">1e-5</span>,</span>
-<span>  center <span class="op">=</span> <span class="st">"items"</span>, bias_correction <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  center <span class="op">=</span> <span class="st">"items"</span>, bias_correction <span class="op">=</span> <span class="st">"none"</span>,</span>
 <span>  estimatewle <span class="op">=</span> <span class="cn">FALSE</span>, verbose <span class="op">=</span> <span class="cn">FALSE</span></span>
 <span><span class="op">)</span></span>
 <span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/utils/str.html" class="external-link">str</a></span><span class="op">(</span><span class="va">fit</span><span class="op">)</span></span>
-<span><span class="co">#&gt; List of 8</span></span>
-<span><span class="co">#&gt;  $ data           : num [1:100, 1:10] 0 1 1 0 NA 0 0 0 1 NA ...</span></span>
-<span><span class="co">#&gt;  $ theta          : num [1:100] -0.415 0.415 -0.415 0.415 -1.81 ...</span></span>
-<span><span class="co">#&gt;  $ beta           : num [1:10] 0.472 -0.495 -0.216 -0.269 0.124 ...</span></span>
-<span><span class="co">#&gt;  $ iterations     : int 5</span></span>
-<span><span class="co">#&gt;  $ converged      : chr "TRUE"</span></span>
-<span><span class="co">#&gt;  $ bias_correction: logi FALSE</span></span>
-<span><span class="co">#&gt;  $ center         : chr "items"</span></span>
-<span><span class="co">#&gt;  $ wle_estimate   : num [1:100] NA NA NA NA NA NA NA NA NA NA ...</span></span>
+<span><span class="co">#&gt; List of 9</span></span>
+<span><span class="co">#&gt;  $ data                : num [1:100, 1:10] 0 1 1 0 NA 0 0 0 1 NA ...</span></span>
+<span><span class="co">#&gt;  $ theta               : num [1:100] -0.415 0.415 -0.415 0.415 -1.81 ...</span></span>
+<span><span class="co">#&gt;  $ beta                : num [1:10] 0.472 -0.495 -0.216 -0.269 0.124 ...</span></span>
+<span><span class="co">#&gt;  $ iterations          : int 4</span></span>
+<span><span class="co">#&gt;  $ converged           : chr "TRUE"</span></span>
+<span><span class="co">#&gt;  $ bias_correction     : logi FALSE</span></span>
+<span><span class="co">#&gt;  $ center              : chr "items"</span></span>
+<span><span class="co">#&gt;  $ wle_estimate        : num [1:100] NA NA NA NA NA NA NA NA NA NA ...</span></span>
+<span><span class="co">#&gt;  $ bias_correction_mode: chr "none"</span></span>
 <span><span class="co">#&gt;  - attr(*, "class")= chr [1:2] "jmleIRT" "list"</span></span></code></pre></div>
 <p>The output is a list with:</p>
 <ul>
@@ -213,7 +221,7 @@ optimization in C++.</p>
 </h3>
 <p>Bias correction rescales item difficulty estimates.</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">fit_bc</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/jmle_estimation.html">jmle_estimation</a></span><span class="op">(</span><span class="va">X</span>, center <span class="op">=</span> <span class="st">"items"</span>, bias_correction <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
+<code class="sourceCode R"><span><span class="va">fit_bc</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/jmle_estimation.html">jmle_estimation</a></span><span class="op">(</span><span class="va">X</span>, center <span class="op">=</span> <span class="st">"items"</span>, bias_correction <span class="op">=</span> <span class="st">"simple"</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">fit_bc</span><span class="op">$</span><span class="va">beta</span><span class="op">)</span></span>
 <span><span class="co">#&gt;      Min.   1st Qu.    Median      Mean   3rd Qu.      Max. </span></span>
 <span><span class="co">#&gt; -0.445178 -0.230402  0.009101  0.000000  0.234625  0.425021</span></span></code></pre></div>

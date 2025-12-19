@@ -14,8 +14,7 @@ summary(object, ...)
 
 - object:
 
-  Object of class `"biasCorrection"` containing `corrected_b` and
-  `corrected_theta`.
+  Object of class `"biasCorrection"` containing `beta` and `theta`.
 
 - ...:
 

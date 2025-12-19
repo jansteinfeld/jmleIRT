@@ -32,7 +32,7 @@ prox_algorithm(dat, dat.resp = NULL, freq = NULL, conv = 0.001, maxiter = 30)
 
 - maxiter:
 
-  Integer specifying the max number of iterations. Defaults to 30.
+  Integer specifying the maximum number of iterations. Defaults to 30.
 
 ## Value
 

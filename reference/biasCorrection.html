@@ -9,7 +9,7 @@ estimators of person (theta) and item (beta) parameters in the Rasch model."></h
 
     <a class="navbar-brand me-2" href="../index.html">jmleIRT</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.0.2-5</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.0.3-5</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -52,14 +52,18 @@ estimators of person (theta) and item (beta) parameters in the Rasch model.</p>
 
     <div class="section level2">
     <h2 id="ref-usage">Usage<a class="anchor" aria-label="anchor" href="#ref-usage"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">biasCorrection</span><span class="op">(</span><span class="va">theta</span>, <span class="va">beta</span>, <span class="va">X</span>, <span class="va">I</span><span class="op">)</span></span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">biasCorrection</span><span class="op">(</span>jmle_obj <span class="op">=</span> <span class="cn">NULL</span>, <span class="va">theta</span>, <span class="va">beta</span>, <span class="va">X</span>, <span class="va">I</span>, <span class="va">...</span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div class="section level2">
     <h2 id="arguments">Arguments<a class="anchor" aria-label="anchor" href="#arguments"></a></h2>
 
 
-<dl><dt id="arg-theta">theta<a class="anchor" aria-label="anchor" href="#arg-theta"></a></dt>
+<dl><dt id="arg-jmle-obj">jmle_obj<a class="anchor" aria-label="anchor" href="#arg-jmle-obj"></a></dt>
+<dd><p>optional An object of class <code>"jmleIRT"</code> as returned by</p></dd>
+
+
+<dt id="arg-theta">theta<a class="anchor" aria-label="anchor" href="#arg-theta"></a></dt>
 <dd><p>Numeric vector of estimated person parameters \(\hat{\theta}\).</p></dd>
 
 
@@ -74,13 +78,17 @@ estimators of person (theta) and item (beta) parameters in the Rasch model.</p>
 <dt id="arg-i">I<a class="anchor" aria-label="anchor" href="#arg-i"></a></dt>
 <dd><p>Integer scalar representing the number of items (used for bias scaling).</p></dd>
 
+
+<dt id="arg--">...<a class="anchor" aria-label="anchor" href="#arg--"></a></dt>
+<dd><p>further arguments, but currently unused.</p></dd>
+
 </dl></div>
     <div class="section level2">
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
     <p>A named list containing bias-corrected parameter vectors:</p><dl><dt>theta</dt>
 <dd><p>Numeric vector of bias-corrected person parameters.</p></dd>
 
-  <dt>beta</dt>
+<dt>beta</dt>
 <dd><p>Numeric vector of bias-corrected item parameters.</p></dd>
 
 
@@ -101,28 +109,31 @@ $$
 \hat{B}_i \approx \frac{E[v_i u_i]}{E[v_i^2]}.
 $$
 In this implementation, scores and information are calculated based on the logistic form of the Rasch model,
-where \(p_{ni} = \frac{e^{\theta_n - \beta_i}}{1 + e^{\theta_n - \beta_i}}\) is the probability that person \(n\)
+where \(p_{pi} = \frac{e^{\theta_p - \beta_i}}{1 + e^{\theta_p - \beta_i}}\) is the probability that person \(p\)
 correctly answers item \(i\).</p>
 <p>Missing responses (NA) in the data matrix \(X\) are handled by omitting those entries.</p>
 
+<p>Let \(P\) denote the number of persons and \(I\) the number of items.
+Let \(X\) be a \(P \times I\) matrix with entries \(X_{pi} \in \{0,1\}\)
+(with NA allowed for missing responses).</p>
 <p>The bias correction is inspired by the incidental parameters literature (Neyman &amp; Scott, 1948;
 Lancaster, 2000; Arellano &amp; Hahn, 2006), which shows that Maximum Likelihood estimators
 in models with many nuisance parameters (like person parameters in Rasch) are biased when
 the number of observations per parameter is limited.</p>
 <p>This function applies a computationally efficient closed-form bias correction using the first and second derivatives
-of the log-likelihood of the Rasch model likelihood function, evaluated at the JML estimates.</p>
+of the Rasch model log-likelihood function, evaluated at the JML estimates.</p>
 <p>The estimator reduces bias by estimating expected score and information terms:
 $$
-u_{ni} = X_{ni} - p_{ni}, \quad v_{ni} = p_{ni} (1 - p_{ni})
+u_{pi} = X_{pi} - p_{pi}, \quad v_{pi} = p_{pi} (1 - p_{pi})
 $$
-for person \(n\) and item \(i\), and then aggregating these across items or persons.</p>
-<p>The bias terms for person \(n\) and item \(i\) are estimated as:
+for person \(p\) and item \(i\), and then aggregating these across items or persons.</p>
+<p>The bias terms for person \(p\) and item \(i\) are estimated as:
 $$
-\hat{B}_{\theta,n} = \frac{\sum_i v_{ni} u_{ni}}{\sum_i v_{ni}^2}, \quad
-\hat{B}_{\beta,i} = \frac{\sum_n v_{ni} (p_{ni} - X_{ni})}{\sum_n v_{ni}^2}
+\hat{B}_{\theta,p} = \frac{\sum_i v_{pi} u_{pi}}{\sum_i v_{pi}^2}, \quad
+\hat{B}_{\beta,i} = \frac{\sum_p v_{pi} (p_{pi} - X_{pi})}{\sum_p v_{pi}^2}
 $$</p>
 <p>This method is applicable when the number of items \(I\) is fixed and moderate, and
-the number of persons \(N\) is large.</p>
+the number of persons \(P\) is large.</p>
     </div>
     <div class="section level2">
     <h2 id="references">References<a class="anchor" aria-label="anchor" href="#references"></a></h2>
@@ -139,7 +150,7 @@ the number of persons \(N\) is large.</p>
 <span class="r-in"><span><span class="va">theta</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0.5</span>, <span class="op">-</span><span class="fl">0.5</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">beta</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="op">-</span><span class="fl">0.2</span>, <span class="fl">0.1</span>, <span class="fl">0.3</span>, <span class="op">-</span><span class="fl">0.1</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">I</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">ncol</a></span><span class="op">(</span><span class="va">X</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="va">corrected</span> <span class="op">&lt;-</span> <span class="fu">biasCorrectionJMLE</span><span class="op">(</span><span class="va">theta</span>, <span class="va">beta</span>, <span class="va">X</span>, <span class="va">I</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">corrected</span> <span class="op">&lt;-</span> <span class="fu">biasCorrection</span><span class="op">(</span>theta <span class="op">=</span> <span class="va">theta</span>, beta <span class="op">=</span> <span class="va">beta</span>, X <span class="op">=</span> <span class="va">X</span>, I <span class="op">=</span> <span class="va">I</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">corrected</span><span class="op">$</span><span class="va">theta</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">corrected</span><span class="op">$</span><span class="va">beta</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="op">}</span> <span class="co"># }</span></span></span>

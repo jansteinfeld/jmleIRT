@@ -43,12 +43,20 @@ package implements:
 Key features: - Missing values by design are allowed (`NA`). - Optional
 epsilon adjustment (`eps`) to reduce estimation bias from extreme
 scores. - Centering based on either “items” or “persons” to ensure
-identifiability. - Post-hoc bias correction
-(`bias_correction = TRUE/FALSE`). - Optional computation of Warm’s
-weighted likelihood estimates (WLE) for person parameters
-(`estimatewle = TRUE`). - Fast Newton-Raphson optimization in C++.
+identifiability. - Optional computation of Warm’s weighted likelihood
+estimates (WLE) for person parameters (`estimatewle = TRUE`). - Fast
+Newton-Raphson optimization in C++. The package implements three levels
+of bias correction for JMLE estimates:
 
-### Simulating Data
+- `"none"`: No bias correction (plain JMLE).
+
+- `"simple"`: Fast finite-sample scaling of item difficulties by a
+  factor (I - 1)/I.
+
+- `"analytic"`: First-order analytical bias correction using score and
+  information terms.
+
+- ### Simulating Data
 
 We first simulate a dataset of person responses.
 
@@ -75,20 +83,21 @@ Run the JML estimation with centering on “items” (default):
 ``` r
 fit <- jmle_estimation(
   X, max_iter = 500, conv = 1e-5,
-  center = "items", bias_correction = FALSE,
+  center = "items", bias_correction = "none",
   estimatewle = FALSE, verbose = FALSE
 )
 
 str(fit)
-#> List of 8
-#>  $ data           : num [1:100, 1:10] 0 1 1 0 NA 0 0 0 1 NA ...
-#>  $ theta          : num [1:100] -0.415 0.415 -0.415 0.415 -1.81 ...
-#>  $ beta           : num [1:10] 0.472 -0.495 -0.216 -0.269 0.124 ...
-#>  $ iterations     : int 5
-#>  $ converged      : chr "TRUE"
-#>  $ bias_correction: logi FALSE
-#>  $ center         : chr "items"
-#>  $ wle_estimate   : num [1:100] NA NA NA NA NA NA NA NA NA NA ...
+#> List of 9
+#>  $ data                : num [1:100, 1:10] 0 1 1 0 NA 0 0 0 1 NA ...
+#>  $ theta               : num [1:100] -0.415 0.415 -0.415 0.415 -1.81 ...
+#>  $ beta                : num [1:10] 0.472 -0.495 -0.216 -0.269 0.124 ...
+#>  $ iterations          : int 4
+#>  $ converged           : chr "TRUE"
+#>  $ bias_correction     : logi FALSE
+#>  $ center              : chr "items"
+#>  $ wle_estimate        : num [1:100] NA NA NA NA NA NA NA NA NA NA ...
+#>  $ bias_correction_mode: chr "none"
 #>  - attr(*, "class")= chr [1:2] "jmleIRT" "list"
 ```
 
@@ -107,7 +116,7 @@ The output is a list with:
 Bias correction rescales item difficulty estimates.
 
 ``` r
-fit_bc <- jmle_estimation(X, center = "items", bias_correction = TRUE)
+fit_bc <- jmle_estimation(X, center = "items", bias_correction = "simple")
 summary(fit_bc$beta)
 #>      Min.   1st Qu.    Median      Mean   3rd Qu.      Max. 
 #> -0.445178 -0.230402  0.009101  0.000000  0.234625  0.425021

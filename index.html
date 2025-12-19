@@ -22,7 +22,7 @@
 
     <a class="navbar-brand me-2" href="index.html">jmleIRT</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.0.2-5</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.0.3-5</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -69,7 +69,7 @@
 <div class="section level2">
 <h2 id="overview">Overview<a class="anchor" aria-label="anchor" href="#overview"></a>
 </h2>
-<p>The <code>jmleIRT</code> package includes <strong>Joint Maximum Likelihood Estimation (JMLE)</strong> for the Rasch model (1PL). It incorporates some selected <strong>bias correction techniques</strong> and offers <strong>Warm’s Weighted Likelihood Estimates (WLE)</strong> for person ability estimation.</p>
+<p>The <code>jmleIRT</code> package includes <strong>Joint Maximum Likelihood Estimation (JMLE)</strong> of person abilities and item difficulties for the Rasch model (1PL). It incorporates some selected <strong>bias correction techniques</strong> and offers <strong>Warm’s Weighted Likelihood Estimates (WLE)</strong> for person ability estimation.</p>
 <hr>
 </div>
 <div class="section level2">
@@ -111,7 +111,7 @@
 <span></span>
 <span><span class="co"># Estimate Rasch model using JMLE with bias correction</span></span>
 <span><span class="va">fit</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/jmle_estimation.html">jmle_estimation</a></span><span class="op">(</span><span class="va">X</span>, max_iter <span class="op">=</span> <span class="fl">200</span>, conv <span class="op">=</span> <span class="fl">1e-5</span>,</span>
-<span>                      center <span class="op">=</span> <span class="st">"items"</span>, bias_correction <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
+<span>                      center <span class="op">=</span> <span class="st">"items"</span>, bias_correction <span class="op">=</span> <span class="st">"simple"</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># Item difficulties (centered)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">fit</span><span class="op">$</span><span class="va">beta</span><span class="op">)</span></span>
@@ -120,7 +120,11 @@
 <span><span class="va">wle_res</span> <span class="op">&lt;-</span> <span class="fu">estimate_wle</span><span class="op">(</span><span class="va">X</span>, <span class="va">fit</span><span class="op">$</span><span class="va">beta</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># Person ability estimates via WLE</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">wle_res</span><span class="op">$</span><span class="va">wle</span><span class="op">)</span></span></code></pre></div>
+<span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">wle_res</span><span class="op">$</span><span class="va">wle</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># Plot item characteristic curves</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">fit</span>, type <span class="op">=</span> <span class="st">"hist"</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">fit</span>, type <span class="op">=</span> <span class="st">"icc"</span>, items <span class="op">=</span> <span class="fl">1</span><span class="op">:</span><span class="fl">3</span><span class="op">)</span></span></code></pre></div>
 <hr>
 </div>
 <div class="section level2">
@@ -147,12 +151,34 @@
 </h2>
 <p>The Joint Maximum Likelihood Estimation (JMLE) for the Rasch model is known to produce biased parameter estimates, especially in finite samples and with extreme response patterns. The <code>jmleIRT</code> package implements two key bias correction techniques:</p>
 <ul>
-<li>
-<strong>Epsilon adjustment:</strong> Proposed by Bertoli Barsotti, Punzo, and Lando, this method adds a small positive constant <math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>ε</mi><mo>&gt;</mo><mn>0</mn></mrow><annotation encoding="application/x-tex">\varepsilon &gt; 0</annotation></semantics></math> during the estimation process. This adjustment prevents infinite log-odds for perfect or zero scores, ensuring finite item difficulty and ability estimates. It also helps alleviate bias related to extreme response patterns by smoothing the estimation.</li>
-<li>
-<strong>Analytical bias correction:</strong> This approach involves modifying the item difficulty estimates based on theoretical bias expressions derived from asymptotic expansions or minimum divergence estimators. It aims to reduce the structural bias inherent in the JMLE estimates as described in psychometric literature (e.g., Bertoli Barsotti &amp; Punzo, 2012; Lando &amp; Bertoli Barsotti, 2014).</li>
+<li><p><strong>Epsilon adjustment:</strong> Proposed by Bertoli Barsotti, Punzo, and Lando, this method adds a small positive constant <math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>ε</mi><mo>&gt;</mo><mn>0</mn></mrow><annotation encoding="application/x-tex">\varepsilon &gt; 0</annotation></semantics></math> during the estimation process. This adjustment prevents infinite log-odds for perfect or zero scores, ensuring finite item difficulty and ability estimates. It also helps alleviate bias related to extreme response patterns by smoothing the estimation. The adjustment is controlled by the argument <code>eps</code> in <code><a href="reference/jmle_estimation.html">jmle_estimation()</a></code>. When <code>eps &gt; 0</code>, a small positive constant is used to regularize extreme response patterns; when <code>eps = 0</code> (default), persons with all 0 or all 1 responses are excluded from the iterative updates and assigned ±Inf afterward.</p></li>
+<li><p><strong>Simple post-hoc bias correction:</strong> The option <code>bias_correction = TRUE</code> in <code><a href="reference/jmle_estimation.html">jmle_estimation()</a></code> applies a simple finite-sample scaling of item difficulties (factor (I − 1)/I) as a fast bias-reduction heuristic.</p></li>
+<li><p><strong>Analytical bias correction:</strong> The function <code><a href="reference/biasCorrection.html">biasCorrection()</a></code> applies a separate, more elaborate first-order analytic correction based on score and information terms for person and item parameters. This approach involves modifying the item difficulty estimates based on theoretical bias expressions derived from asymptotic expansions or minimum divergence estimators. It aims to reduce the structural bias inherent in the JMLE estimates as described in psychometric literature (e.g., Bertoli Barsotti &amp; Punzo, 2012; Lando &amp; Bertoli Barsotti, 2014).</p></li>
 </ul>
 <p>In combination, the epsilon adjustment promotes numerical stability and improved bias behavior at the estimation level, while analytical bias correction provides targeted, theoretically grounded refinement of item parameter estimates to enhance overall accuracy and robustness of the JMLE algorithm.</p>
+</div>
+<div class="section level2">
+<h2 id="bias-correction-modes">Bias correction modes<a class="anchor" aria-label="anchor" href="#bias-correction-modes"></a>
+</h2>
+<p>The <code>jmleIRT</code> package offers three levels of bias correction for the JMLE estimates, controlled by the argument <code>bias_correction</code> in <code><a href="reference/jmle_estimation.html">jmle_estimation()</a></code>:</p>
+<ul>
+<li><p><strong><code>"none"</code></strong>: Plain JMLE without any bias correction. This is the classical joint ML estimator and is useful as a baseline, but is known to be biased in finite samples.</p></li>
+<li><p><strong><code>"simple"</code></strong>: A fast finite-sample adjustment that rescales item difficulties by a factor <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mrow><mo stretchy="true" form="prefix">(</mo><mi>I</mi><mo>−</mo><mn>1</mn><mo stretchy="true" form="postfix">)</mo></mrow><mi>/</mi><mi>I</mi></mrow><annotation encoding="application/x-tex">(I - 1)/I</annotation></semantics></math>, where <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>I</mi><annotation encoding="application/x-tex">I</annotation></semantics></math> is the number of items. This provides a quick reduction of the small-sample bias in item parameters.</p></li>
+<li><p><strong><code>"analytic"</code></strong>: A first-order analytical bias correction based on score and information terms for persons and items. Internally, <code>jmle_estimation(..., bias_correction = "analytic")</code> first computes the JMLE solution and then calls <code><a href="reference/biasCorrection.html">biasCorrection()</a></code> to obtain corrected parameters. The result object contains both the raw JMLE (<code>theta</code>, <code>beta</code>) and the analytically corrected estimates (<code>theta_analytic</code>, <code>beta_analytic</code>).</p></li>
+<li><p>Use <code>"none"</code> for didactic purposes and to reproduce classical JMLE results.</p></li>
+<li><p>Use <code>"simple"</code> for ‘quick, low-cost bias reduction’ in item difficulties.</p></li>
+<li><p>Use <code>"analytic"</code> when sample size is moderate to large (N &gt;&gt; I) and bias in both person and item parameters is a concern.</p></li>
+</ul>
+</div>
+<div class="section level2">
+<h2 id="person-ability-estimates-jmle-vs-wle">Person ability estimates: JMLE vs WLE<a class="anchor" aria-label="anchor" href="#person-ability-estimates-jmle-vs-wle"></a>
+</h2>
+<p>By default, <code><a href="reference/jmle_estimation.html">jmle_estimation()</a></code> returns joint ML person estimates <code>theta</code>. For reporting individual abilities, <strong>Warm’s Weighted Likelihood Estimates (WLE)</strong> often have better bias properties.</p>
+<ul>
+<li>Set <code>estimatewle = TRUE</code> in <code><a href="reference/jmle_estimation.html">jmle_estimation()</a></code> to obtain WLEs in <code>fit$wle_estimate</code>.</li>
+<li>The joint ML estimates (<code>fit$theta</code>) are primarily useful for calibration and comparison with other Rasch estimation methods.</li>
+</ul>
+<p>The object returned by <code><a href="reference/jmle_estimation.html">jmle_estimation()</a></code> also contains approximate standard errors for person and item parameters (<code>se_theta</code>, <code>se_beta</code>), computed from the observed information at the final JMLE solution.</p>
 </div>
 <div class="section level2">
 <h2 id="package-features">Package Features<a class="anchor" aria-label="anchor" href="#package-features"></a>
